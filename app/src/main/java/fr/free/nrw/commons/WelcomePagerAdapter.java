@@ -12,7 +12,6 @@ import androidx.viewpager.widget.PagerAdapter;
 public class WelcomePagerAdapter extends PagerAdapter {
     private static final int[] PAGE_LAYOUTS = new int[]{
             R.layout.welcome_wikipedia,
-            R.layout.welcome_howto_upload,
             R.layout.welcome_do_upload,
             R.layout.welcome_dont_upload,
             R.layout.welcome_image_example,

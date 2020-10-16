@@ -6,20 +6,6 @@
     android:background="?attr/tutorialBackground"
     >
 
-    <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/standard_gap"
-      android:layout_marginBottom="@dimen/standard_gap"
-      android:text="Upload button can be found on the bottom right-hand corner of the home page"
-      android:textAlignment="center"
-      android:textColor="@android:color/white"
-      android:textSize="@dimen/normal_text"
-      android:textStyle="bold"
-      android:paddingTop="64dp"
-      android:paddingLeft="48dp"
-      android:paddingRight="48dp"/>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
