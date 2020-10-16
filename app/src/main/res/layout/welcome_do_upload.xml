@@ -36,7 +36,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tutorial_2_subtext_1"
+            android:text="@string/tutorial_3_subtext_1"
             android:textColor="@android:color/white" />
 
     </LinearLayout>
@@ -51,7 +51,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tutorial_2_subtext_2"
+            android:text="@string/tutorial_3_subtext_2"
             android:textColor="@android:color/white" />
     </LinearLayout>
 
@@ -65,7 +65,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tutorial_2_subtext_3"
+            android:text="@string/tutorial_3_subtext_3"
             android:textColor="@android:color/white" />
     </LinearLayout>
 
