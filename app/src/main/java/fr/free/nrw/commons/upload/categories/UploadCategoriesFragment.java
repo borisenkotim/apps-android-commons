@@ -64,7 +64,7 @@ public class UploadCategoriesFragment extends UploadBaseFragment implements Cate
 
     private void init() {
         tvTitle.setText(getString(R.string.step_count, callback.getIndexInViewFlipper(this) + 1,
-                callback.getTotalNumberOfSteps()));
+                callback.getTotalNumberOfSteps()) + R.string.step_3_summary);
         presenter.onAttachView(this);
         initRecyclerView();
         addTextChangeListenerToEtSearch();
