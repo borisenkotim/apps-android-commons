@@ -71,7 +71,7 @@ public class DepictsFragment extends UploadBaseFragment implements DepictsContra
      */
     private void init() {
         depictsTitle.setText(getString(R.string.step_count, callback.getIndexInViewFlipper(this) + 1,
-                callback.getTotalNumberOfSteps()) + R.string.step_2_summary);
+                callback.getTotalNumberOfSteps()) + getString(R.string.step_2_summary));
         presenter.onAttachView(this);
         initRecyclerView();
         addTextChangeListenerToSearchBox();

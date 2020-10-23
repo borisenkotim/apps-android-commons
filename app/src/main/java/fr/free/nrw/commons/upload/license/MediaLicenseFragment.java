@@ -67,7 +67,7 @@ public class MediaLicenseFragment extends UploadBaseFragment implements MediaLic
 
     private void init() {
         tvTitle.setText(getString(R.string.step_count, callback.getIndexInViewFlipper(this) + 1,
-                callback.getTotalNumberOfSteps()) + R.string.step_4_summary);
+                callback.getTotalNumberOfSteps()) + getString(R.string.step_4_summary));
         initPresenter();
         initLicenseSpinner();
         presenter.getLicenses();
