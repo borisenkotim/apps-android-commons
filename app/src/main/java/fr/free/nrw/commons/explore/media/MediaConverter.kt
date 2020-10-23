@@ -63,9 +63,16 @@ class MediaConverter @Inject constructor() {
      */
     private fun getArtist(metadata: ExtMetadata): String? {
         return try {
+            val anchorStartTagTerminalChars = "\">"
+            val anchorCloseTag = "</a>"
             val artistHtml = metadata.artist()
-            artistHtml.substring(artistHtml.indexOf("title=\""), artistHtml.indexOf("\">"))
-                .replace("title=\"User:", "")
+
+            return artistHtml
+                .substring(
+                    artistHtml.indexOf(anchorStartTagTerminalChars) +
+                        anchorStartTagTerminalChars.length,
+                    artistHtml.indexOf(anchorCloseTag)
+                )
         } catch (ex: java.lang.Exception) {
             ""
         }
