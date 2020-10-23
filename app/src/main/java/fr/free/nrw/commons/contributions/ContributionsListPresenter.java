@@ -46,8 +46,8 @@ public class ContributionsListPresenter implements UserActionListener {
   void setup() {
     final PagedList.Config pagedListConfig =
         (new PagedList.Config.Builder())
-            .setPrefetchDistance(50)
-            .setPageSize(10).build();
+            .setPrefetchDistance(8)
+            .setPageSize(4).build();
     contributionList = (new LivePagedListBuilder(repository.fetchContributions(), pagedListConfig)
         .setBoundaryCallback(contributionBoundaryCallback)).build();
   }
