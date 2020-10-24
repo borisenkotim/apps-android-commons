@@ -35,7 +35,7 @@ public class ProfileActivity extends NavigationBaseActivity {
     private LeaderboardFragment leaderboardFragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
@@ -62,7 +62,7 @@ public class ProfileActivity extends NavigationBaseActivity {
     /**
      * Set the tabs for the fragments
      */
-    private void setTabs() {
+    public void setTabs() {
         List<Fragment> fragmentList = new ArrayList<>();
         List<String> titleList = new ArrayList<>();
         achievementsFragment = new AchievementsFragment();
