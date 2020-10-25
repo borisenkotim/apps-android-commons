@@ -1,18 +1,26 @@
 package fr.free.nrw.commons
 
 import android.content.Intent
+import androidx.viewpager.widget.ViewPager
 import fr.free.nrw.commons.TestCommonsApplication.Companion.getContext
 import fr.free.nrw.commons.profile.ProfileActivity
-import fr.free.nrw.commons.quiz.QuizActivity
-import junit.framework.Assert
+import fr.free.nrw.commons.profile.ViewPagerAdapter
+import io.reactivex.Single
 import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
+import org.mockito.MockitoAnnotations
 
 /**
  * Tests Welcome Activity Methods
@@ -22,23 +30,31 @@ import org.robolectric.annotation.Config
 class ProfileActivityUnitTest {
 
     private lateinit var activity: ProfileActivity
+    private lateinit var activityMock: ProfileActivity
+    private lateinit var adapter: ViewPagerAdapter
+    var viewPager: ViewPager? = null
 
     /**
      * Setup the Class and Views for Test
      */
     @Before
     fun setup() {
-       // val intent = Intent()
         activity = Robolectric.buildActivity(ProfileActivity::class.java, Intent()).get()
-     //   activity.onCreate(null)
+        adapter = ViewPagerAdapter(null)
+        viewPager?.setAdapter(adapter)
+        activityMock = mock(ProfileActivity::class.java)
     }
 
     @Test
     @Throws(Exception::class)
     fun checkActivityNotNull() {
         assertNotNull(activity)
+        assertNotNull(adapter)
     }
 
+    /**
+     * Tests the contents of the startYourself method
+     */
     @Test
     @Throws(Exception::class)
     fun testStartYourself() {
@@ -55,15 +71,13 @@ class ProfileActivityUnitTest {
     @Test
     @Throws(Exception::class)
     fun testSetTabs() {
-        assertTrue(true)
-        // use mock class to fix this error
-       // activity.setTabs();
+        activityMock.setTabs()
     }
 
     @Test
     @Throws(Exception::class)
     fun testOnDestroy() {
-  //      activity.onDestroy()
+        activityMock.onDestroy()
     }
 
 }
