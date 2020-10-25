@@ -12,6 +12,7 @@ import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,6 +53,11 @@ class ContributionsListPresenterTest {
             ContributionsListPresenter(contributionBoundaryCallback, repository, scheduler);
     }
 
+    @Test
+    fun testActivityNotNull() {
+        Assert.assertNotNull(contributionsListPresenter);
+    }
+    
     @Test
     fun testDeleteUpload() {
         whenever(repository.deleteContributionFromDB(any<Contribution>()))
