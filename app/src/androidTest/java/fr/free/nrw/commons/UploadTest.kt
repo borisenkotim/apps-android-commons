@@ -13,6 +13,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.NoMatchingViewException
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
@@ -20,6 +21,7 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasType
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
@@ -276,6 +278,78 @@ class UploadTest {
 
         onView(allOf(isDisplayed(), withId(R.id.btn_submit)))
                 .perform(click())
+
+        UITestHelper.sleep(10000)
+
+        val fileUrl = "https://commons.wikimedia.beta.wmflabs.org/wiki/File:" +
+                commonsFileName.replace(' ', '_') + ".jpg"
+        Timber.i("File should be uploaded to $fileUrl")
+    }
+
+    @Test
+    fun verifyUploadStepSummaryText() {
+        if (!ConfigUtils.isBetaFlavour) {
+            throw Error("This test should only be run in Beta!")
+        }
+
+        setupSingleUpload("image.jpg")
+
+        openGallery()
+
+        // Validate that an intent to get an image is sent
+        intended(allOf(hasAction(Intent.ACTION_GET_CONTENT), hasType("image/*")))
+
+        // Create filename with the current time (to prevent overwrites)
+        val dateFormat = SimpleDateFormat("yyMMdd-hhmmss")
+        val commonsFileName = "MobileTest " + dateFormat.format(Date())
+
+        // Try to dismiss the error, if there is one (probably about duplicate files on Commons)
+        dismissWarning("Yes")
+
+        onView(ViewMatchers.withId(R.id.tv_title))
+            .check(ViewAssertions.matches(ViewMatchers.withText("Step 1 of 4: Description")))
+
+        onView(allOf<View>(isDisplayed(), withId(R.id.tv_title)))
+            .perform(replaceText(commonsFileName))
+
+        onView(allOf<View>(isDisplayed(), withId(R.id.description_item_edit_text)))
+            .perform(replaceText(commonsFileName))
+
+
+        onView(allOf(isDisplayed(), withId(R.id.btn_next)))
+            .perform(click())
+
+        UITestHelper.sleep(5000)
+        dismissWarning("Yes")
+
+        UITestHelper.sleep(3000)
+
+        onView(ViewMatchers.withId(R.id.tv_title))
+            .check(ViewAssertions.matches(ViewMatchers.withText("Step 2 of 4: Depicts")))
+
+        onView(allOf(isDisplayed(), withId(R.id.et_search)))
+            .perform(replaceText("Uploaded with Mobile/Android Tests"))
+
+        UITestHelper.sleep(3000)
+
+        try {
+            onView(allOf(isDisplayed(), UITestHelper.first(withParent(withId(R.id.rv_categories)))))
+                .perform(click())
+        } catch (ignored: NoMatchingViewException) {
+        }
+
+        onView(allOf(isDisplayed(), withId(R.id.btn_next)))
+            .perform(click())
+
+        dismissWarning("Yes, Submit")
+
+        UITestHelper.sleep(500)
+
+        onView(ViewMatchers.withId(R.id.tv_title))
+            .check(ViewAssertions.matches(ViewMatchers.withText("Step 3 of 4: Categories")))
+
+        onView(allOf(isDisplayed(), withId(R.id.btn_submit)))
+            .perform(click())
 
         UITestHelper.sleep(10000)
 
