@@ -63,4 +63,18 @@ class MediaConverterTest {
         media = mediaConverter.convert(page, entity, imageInfo)
         assertEquals(media.thumbUrl, "thumbUrl")
     }
+
+    @Test
+    fun testConvertRemoveNotFoundDialogue() {
+        Mockito.`when`(imageInfo.metadata).thenReturn(metadata)
+        Mockito.`when`(imageInfo.thumbUrl).thenReturn("thumbUrl")
+        Mockito.`when`(imageInfo.originalUrl).thenReturn("originalUrl")
+        Mockito.`when`(imageInfo.metadata?.licenseUrl()).thenReturn("licenseUrl")
+        Mockito.`when`(imageInfo.metadata?.dateTime()).thenReturn("yyyy-MM-dd HH:mm:ss")
+        Mockito.`when`(imageInfo.metadata?.artist()).thenReturn(
+            "<a href=\"someURL\" class=\"new\" " +
+                    "title=\"User: Username (page does not exist)\">Username</a>")
+        media = mediaConverter.convert(page, entity, imageInfo)
+        assertEquals(media.creator, "Username")
+    }
 }
