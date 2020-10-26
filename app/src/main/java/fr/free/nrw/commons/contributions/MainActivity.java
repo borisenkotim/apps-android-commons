@@ -242,7 +242,7 @@ public class MainActivity extends NavigationBaseActivity implements FragmentMana
             // Meas that contribution fragment is visible (not nearby fragment)
             ContributionsFragment contributionsFragment = (ContributionsFragment) getSupportFragmentManager().findFragmentByTag(contributionsFragmentTag);
 
-            if (contributionsFragment.getChildFragmentManager().getBackStackEntryCount()>0 ) {
+            if (contributionsFragment.getChildFragmentManager().findFragmentByTag(ContributionsFragment.MEDIA_DETAIL_PAGER_FRAGMENT_TAG) != null) {
                 // Means that media details fragment is visible to uer instead of contributions list fragment (As chils fragment)
                 // Then we want to go back to contributions list fragment on backbutton pressed from media detail fragment
                 contributionsFragment.getChildFragmentManager().popBackStack();
@@ -257,13 +257,12 @@ public class MainActivity extends NavigationBaseActivity implements FragmentMana
                     contributionsFragment.nearbyNotificationCardView.setVisibility(View.GONE);
                 }
             } else {
-                super.onBackPressed();
+                finish();
             }
-        } else if (getSupportFragmentManager().findFragmentByTag(nearbyFragmentTag) != null
-            && !isContributionsFragmentVisible) {
+        } else if (getSupportFragmentManager().findFragmentByTag(nearbyFragmentTag) != null && !isContributionsFragmentVisible) {
             // Means that nearby fragment is visible (not contributions fragment)
-            if (null == nearbyParentFragment || !nearbyParentFragment.backButtonClicked()) {
-                super.onBackPressed();
+            if (null != nearbyParentFragment) {
+                nearbyParentFragment.backButtonClicked();
             }
         } else {
             super.onBackPressed();

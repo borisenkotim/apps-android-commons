@@ -76,6 +76,13 @@ class UploadTest {
         Intents.release()
     }
 
+
+    @Test
+    fun testAddDetailsCheckbox(){
+
+
+    }
+
     @Test
     fun testUploadWithDescription() {
         if (!ConfigUtils.isBetaFlavour) {

@@ -1,4 +1,8 @@
 package fr.free.nrw.commons.upload
+import android.view.View
+import android.widget.CheckBox;
+import fr.free.nrw.commons.R
+import kotlinx.android.synthetic.main.row_item_description.view.*
 
 /**
  * Holds a description of an item being uploaded by [UploadActivity]
@@ -12,6 +16,7 @@ class Description {
      */
     var languageCode: String? = null
     var descriptionText: String? = null
+
     /**
      * @return the index of the  language selected in a spinner with [SpinnerLanguagesAdapter]
      */
@@ -39,6 +44,7 @@ class Description {
          * @param descriptions the list of descriptions, description is ignored if text is null.
          * @return a string with the pattern of {{en|1=descriptionText}}
          */
+
         @JvmStatic
         fun formatList(descriptions: List<Description>): String {
             val descListString = StringBuilder()
@@ -49,6 +55,8 @@ class Description {
                     descListString.append(individualDescription)
                 }
             }
+
+
             return descListString.toString()
         }
     }

@@ -2,6 +2,7 @@ package fr.free.nrw.commons.review
 
 import com.nhaarman.mockitokotlin2.whenever
 import fr.free.nrw.commons.Media
+import fr.free.nrw.commons.R
 import fr.free.nrw.commons.media.MediaClient
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -18,6 +19,7 @@ import org.wikipedia.dataclient.mwapi.MwQueryPage
 import org.wikipedia.dataclient.mwapi.MwQueryResponse
 import org.wikipedia.dataclient.mwapi.MwQueryResult
 import org.wikipedia.dataclient.mwapi.RecentChange
+
 
 /**
  * Test class for ReviewHelper
@@ -81,6 +83,16 @@ class ReviewHelperTest {
         verify(reviewInterface, times(1))!!.getRecentChanges(ArgumentMatchers.anyString())
     }
 
+    /**
+     * Test tool tip that shows the info on page
+     */
+    @Test
+    fun checkToolTipBox(){
+
+        `when`(mediaClient?.checkPageExistsUsingTitle("showInfo"))
+            .thenReturn(Single.just(true))
+
+    }
     /**
      * Test scenario when all media is already nominated for deletion
      */
