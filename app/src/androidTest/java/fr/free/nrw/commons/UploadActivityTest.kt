@@ -3,6 +3,7 @@ package fr.free.nrw.commons
 import android.net.Uri
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers
@@ -45,5 +46,23 @@ class UploadActivityTest {
         Espresso.onView(ViewMatchers.withId(R.id.btn_next))
                 .perform(ViewActions.click())
         Intents.intended(IntentMatchers.hasComponent(DepictsFragment::class.java.name))
+    }
+
+    @Test
+    fun testAPISupportedLanguages() {
+        Espresso.onView(ViewMatchers.withId(R.id.spinner_description_languages)).perform(ViewActions.click());
+        Espresso.onData(AllOf.allOf(Matchers.anything("spinner text"))).atPosition(1).perform(ViewActions.click());
+        Espresso.onData(AllOf.allOf(Matchers.anything("spinner text"))).atPosition(1).check(
+            ViewAssertions.matches(ViewMatchers.withText("English [en]")));
+
+        Espresso.onView(ViewMatchers.withId(R.id.spinner_description_languages)).perform(ViewActions.click());
+        Espresso.onData(AllOf.allOf(Matchers.anything("spinner text"))).atPosition(2).perform(ViewActions.click());
+        Espresso.onData(AllOf.allOf(Matchers.anything("spinner text"))).atPosition(1).check(
+            ViewAssertions.matches(ViewMatchers.withText("English (British Virgin Islands) [en]")));
+
+        Espresso.onView(ViewMatchers.withId(R.id.spinner_description_languages)).perform(ViewActions.click());
+        Espresso.onData(AllOf.allOf(Matchers.anything("spinner text"))).atPosition(3).perform(ViewActions.click());
+        Espresso.onData(AllOf.allOf(Matchers.anything("spinner text"))).atPosition(1).check(
+            ViewAssertions.matches(ViewMatchers.withText("English (Canada) [en]")));
     }
 }
