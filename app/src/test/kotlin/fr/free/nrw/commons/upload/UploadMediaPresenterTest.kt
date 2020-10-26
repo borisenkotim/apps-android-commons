@@ -1,5 +1,6 @@
 package fr.free.nrw.commons.upload
 
+import android.widget.CheckBox
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import fr.free.nrw.commons.filepicker.UploadableFile
@@ -43,6 +44,9 @@ class UploadMediaPresenterTest {
 
     @Mock
     private lateinit var uploadItem: UploadItem
+
+    @Mock
+    private lateinit var checkbox: CheckBox
 
     @Mock
     private lateinit var uploadMediaDetails: List<UploadMediaDetail>
@@ -146,6 +150,63 @@ class UploadMediaPresenterTest {
             verify(view).onImageValidationSuccess()
         }
     }
+
+
+    /*Tests description without button pressed for checkbox to add details later */
+    @Test
+    fun addSingleDescription() {
+        val uploadMediaDetail = UploadMediaDetail()
+        uploadMediaDetail.descriptionText = "Here is a description with checbox not checked"
+        uploadMediaDetail.languageCode = "en"
+        verify(checkbox).isChecked == false;
+        val uploadMediaDetailList: ArrayList<UploadMediaDetail> = ArrayList()
+        uploadMediaDetailList.add(uploadMediaDetail)
+        uploadItem.setMediaDetails(uploadMediaDetailList)
+        Mockito.`when`(repository.getImageQuality(uploadItem)).then {
+            verify(view).showProgress(true)
+            testScheduler.triggerActions()
+            verify(view).showProgress(true)
+            verify(view).onImageValidationSuccess()
+        }
+    }
+
+    /*Tests description without button pressed for checkbox to add details later */
+    @Test
+    fun addSingleDescriptionWithCheckboxNotChecked() {
+        val uploadMediaDetail = UploadMediaDetail()
+        uploadMediaDetail.descriptionText = "added description"
+        uploadMediaDetail.languageCode = "en"
+        val uploadMediaDetailList: ArrayList<UploadMediaDetail> = ArrayList()
+        uploadMediaDetailList.add(uploadMediaDetail)
+        uploadItem.setMediaDetails(uploadMediaDetailList)
+        Mockito.`when`(repository.getImageQuality(uploadItem)).then {
+            verify(view).showProgress(true)
+            testScheduler.triggerActions()
+            verify(view).showProgress(true)
+            verify(view).onImageValidationSuccess()
+        }
+    }
+
+    /*Tests description without button pressed for checkbox to add details later */
+    @Test
+    fun addSingleDescriptionWithCheckboxChecked() {
+        val uploadMediaDetail = UploadMediaDetail()
+        uploadMediaDetail.descriptionText = "added description I will add details later"
+        uploadMediaDetail.languageCode = "en"
+        verify(checkbox).isChecked == true;
+        val uploadMediaDetailList: ArrayList<UploadMediaDetail> = ArrayList()
+        uploadMediaDetailList.add(uploadMediaDetail)
+        uploadItem.setMediaDetails(uploadMediaDetailList)
+        Mockito.`when`(repository.getImageQuality(uploadItem)).then {
+            verify(view).showProgress(true)
+            testScheduler.triggerActions()
+            verify(view).showProgress(true)
+            verify(view).onImageValidationSuccess()
+        }
+    }
+
+
+
 
     @Test
     fun addMultipleCaptions() {

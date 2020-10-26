@@ -1,6 +1,5 @@
 package fr.free.nrw.commons.contributions;
 
-import android.database.sqlite.SQLiteException;
 import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -69,7 +68,7 @@ public abstract class ContributionDao {
   public abstract Single<Integer> updateStates(int state, int[] toUpdateStates);
 
   @Query("Delete FROM contribution")
-  public abstract void deleteAll() throws SQLiteException;
+  public abstract void deleteAll();
 
   @Update
   public abstract void updateSynchronous(Contribution contribution);

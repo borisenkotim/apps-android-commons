@@ -980,8 +980,8 @@ public class NearbyParentFragment extends CommonsDaggerSupportFragment
         }
     }
 
-    public boolean backButtonClicked() {
-        return presenter.backButtonClicked();
+    public void backButtonClicked() {
+        presenter.backButtonClicked();
     }
 
     /**

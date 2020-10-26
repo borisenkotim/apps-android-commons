@@ -46,6 +46,13 @@
             android:hint="@string/share_description_hint"
             android:imeOptions="actionNext|flagNoExtractUi"
             android:inputType="textMultiLine" />
+
+        <CheckBox
+          android:id="@+id/add_details_later"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="I will add details later."
+          android:onClick = "onCheckBoxClicked"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>

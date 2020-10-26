@@ -3,9 +3,11 @@ package fr.free.nrw.commons.upload;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.CheckBox;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -20,12 +22,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import timber.log.Timber;
+import android.widget.CheckBox;
+import android.widget.Toast;
+import android.os.Bundle;
 
 public class UploadMediaDetailAdapter extends RecyclerView.Adapter<UploadMediaDetailAdapter.ViewHolder> {
 
     private List<UploadMediaDetail> uploadMediaDetails;
     private Callback callback;
     private EventListener eventListener;
+    
 
     private HashMap<AdapterView, String> selectedLanguages;
     private final String savedLanguageValue;
@@ -74,6 +80,7 @@ public class UploadMediaDetailAdapter extends RecyclerView.Adapter<UploadMediaDe
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
+
         @Nullable
         @BindView(R.id.spinner_description_languages)
         AppCompatSpinner spinnerDescriptionLanguages;
@@ -89,6 +96,13 @@ public class UploadMediaDetailAdapter extends RecyclerView.Adapter<UploadMediaDe
 
         @BindView(R.id.caption_item_edit_text_input_layout)
         TextInputLayout captionInputLayout;
+
+        @BindView(R.id.add_details_later)
+        CheckBox addDetailsCheckBox;
+
+
+
+        private View view;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -139,7 +153,29 @@ public class UploadMediaDetailAdapter extends RecyclerView.Adapter<UploadMediaDe
             } else {
                 captionItemEditText.clearFocus();
             }
+
+
+            addDetailsCheckBox.setOnClickListener(v -> {
+                if(addDetailsCheckBox.isChecked()){
+                    descItemEditText.append("\n I will add details later.");
+                }
+                else
+                {
+                    descItemEditText.getText().clear();
+                }
+            });
         }
+
+
+
+
+
+
+
+
+
+
+
 
         /**
          * Extracted out the function to init the language spinner with different system supported languages
