@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.annotation.LayoutRes
 import androidx.core.os.ConfigurationCompat
+import fr.free.nrw.commons.CommonsApplication
 import fr.free.nrw.commons.R
 import fr.free.nrw.commons.utils.LangCodeUtils
 import kotlinx.android.extensions.LayoutContainer
@@ -33,8 +34,15 @@ class SpinnerLanguagesAdapter constructor(
         val sortedLanguages = Locale.getAvailableLocales()
             .map(::Language)
             .sortedBy { it.locale.displayName }
-        languageNamesList = sortedLanguages.map { it.locale.displayName }
-        languageCodesList = sortedLanguages.map { it.locale.language }
+
+        val supportedLanguages = sortedLanguages.filter { it.locale.displayName == "English"
+                || it.locale.displayName == "English (Canada)"
+                || it.locale.displayName == "Patios"
+                || it.locale.displayName == "English (British Virgin Islands)"
+                || it.locale.displayName == "Ænglisc"}
+
+        languageNamesList = supportedLanguages.map { it.locale.displayName }
+        languageCodesList = supportedLanguages.map { it.locale.language }
     }
 
     var selectedLangCode = ""
