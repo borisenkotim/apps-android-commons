@@ -66,7 +66,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return true;
             });
         }
+        setPreference();
+    }
 
+    private void setPreference() {
         langListPreference = findPreference("descriptionDefaultLanguagePref");
         prepareLanguages();
         Preference betaTesterPreference = findPreference("becomeBetaTester");
@@ -81,11 +84,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
         // Disable some settings when not logged in.
         if (defaultKvStore.getBoolean("login_skipped", false)) {
-            findPreference("useExternalStorage").setEnabled(false);
-            findPreference("useAuthorName").setEnabled(false);
-            findPreference("displayNearbyCardView").setEnabled(false);
-            findPreference("displayLocationPermissionForCardView").setEnabled(false);
-            findPreference("displayCampaignsCardView").setEnabled(false);
+            setEnabledToFalse("useExternalStorage");
+            setEnabledToFalse("useExternalStorage");
+            setEnabledToFalse("useAuthorName");
+            setEnabledToFalse("displayNearbyCardView");
+            setEnabledToFalse("displayLocationPermissionForCardView");
+            setEnabledToFalse("displayCampaignsCardView");
         }
 
         findPreference("telemetryOptOut").setOnPreferenceChangeListener(
@@ -94,6 +98,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 defaultKvStore.putBoolean(Prefs.TELEMETRY_PREFERENCE,(boolean)newValue);
                 return true;
             });
+    }
+
+    private void setEnabledToFalse(String key) {
+        findPreference(key).setEnabled(false);
     }
 
     /**
@@ -137,8 +145,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         }
 
-        CharSequence[] languageNames = languageNamesList.toArray(new CharSequence[0]);
-        CharSequence[] languageCodes = languageCodesList.toArray(new CharSequence[0]);
+        languageAttributes(languageNamesList, languageCodesList);
+
+        langListPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            String userSelectedValue = (String) newValue;
+            saveLanguageValue(userSelectedValue);
+            return true;
+        });
+    }
+
+    private void languageAttributes(List<String> names, List<String> codes) {
+        CharSequence[] languageNames = names.toArray(new CharSequence[0]);
+        CharSequence[] languageCodes = codes.toArray(new CharSequence[0]);
         // Add all languages and languages codes to lists preference as pair
         langListPreference.setEntries(languageNames);
         langListPreference.setEntryValues(languageCodes);
@@ -152,12 +170,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             // If any language is selected by user previously, use it
             langListPreference.setValue(languageCode);
         }
-
-        langListPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            String userSelectedValue = (String) newValue;
-            saveLanguageValue(userSelectedValue);
-            return true;
-        });
     }
 
     private void saveLanguageValue(String userSelectedValue) {
