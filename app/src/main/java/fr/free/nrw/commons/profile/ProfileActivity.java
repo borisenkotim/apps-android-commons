@@ -46,7 +46,10 @@ public class ProfileActivity extends NavigationBaseActivity {
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-        setTabs();
+        List<Fragment> fragmentList = new ArrayList<>();
+        List<String> titleList = new ArrayList<>();
+        setTabs(fragmentList, titleList);
+        setTabData(fragmentList, titleList);
     }
 
     /**
@@ -62,19 +65,20 @@ public class ProfileActivity extends NavigationBaseActivity {
     /**
      * Set the tabs for the fragments
      */
-    public void setTabs() {
-        List<Fragment> fragmentList = new ArrayList<>();
-        List<String> titleList = new ArrayList<>();
+    public void setTabs(List<Fragment> fragmentList, List<String> titleList) {
         achievementsFragment = new AchievementsFragment();
         fragmentList.add(achievementsFragment);
         titleList.add(getResources().getString(R.string.achievements_tab_title).toUpperCase());
         leaderboardFragment = new LeaderboardFragment();
         fragmentList.add(leaderboardFragment);
         titleList.add(getResources().getString(R.string.leaderboard_tab_title).toUpperCase());
+    }
+
+    private void setTabData(List<Fragment> fragmentList, List<String> titleList) {
         viewPagerAdapter.setTabData(fragmentList, titleList);
         viewPagerAdapter.notifyDataSetChanged();
-
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

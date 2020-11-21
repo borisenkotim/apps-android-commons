@@ -5,22 +5,15 @@ import androidx.viewpager.widget.ViewPager
 import fr.free.nrw.commons.TestCommonsApplication.Companion.getContext
 import fr.free.nrw.commons.profile.ProfileActivity
 import fr.free.nrw.commons.profile.ViewPagerAdapter
-import io.reactivex.Single
 import junit.framework.Assert.assertNotNull
-import junit.framework.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.mockito.MockitoAnnotations
+import java.util.*
 
 /**
  * Tests Welcome Activity Methods
@@ -71,7 +64,8 @@ class ProfileActivityUnitTest {
     @Test
     @Throws(Exception::class)
     fun testSetTabs() {
-        activityMock.setTabs()
+        activityMock.setTabs(ArrayList(),ArrayList())
+        activity.setTabs(ArrayList(),ArrayList())
     }
 
     @Test
