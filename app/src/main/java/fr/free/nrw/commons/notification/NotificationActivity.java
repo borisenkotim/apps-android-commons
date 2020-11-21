@@ -229,7 +229,7 @@ public class NotificationActivity extends NavigationBaseActivity {
 
     private void setPageTitle() {
         if (getSupportActionBar() != null) {
-            if (getIntent().getStringExtra("title").equals("read")) {
+            if (intentTitleRead()) {
                 getSupportActionBar().setTitle(R.string.read_notifications);
             } else {
                 getSupportActionBar().setTitle(R.string.notifications);
@@ -238,7 +238,7 @@ public class NotificationActivity extends NavigationBaseActivity {
     }
 
     private void setEmptyView() {
-        if (getIntent().getStringExtra("title").equals("read")) {
+        if (intentTitleRead()) {
             noNotificationText.setText(R.string.no_read_notification);
         }else {
             noNotificationText.setText(R.string.no_notification);
@@ -246,12 +246,16 @@ public class NotificationActivity extends NavigationBaseActivity {
     }
 
     private void setMenuItemTitle() {
-        if (getIntent().getStringExtra("title").equals("read")) {
+        if (intentTitleRead()) {
             notificationMenuItem.setTitle(R.string.menu_option_unread);
 
         }else {
             notificationMenuItem.setTitle(R.string.menu_option_read);
 
         }
+    }
+
+    private boolean intentTitleRead() {
+        return getIntent().getStringExtra("title").equals("read");
     }
 }
