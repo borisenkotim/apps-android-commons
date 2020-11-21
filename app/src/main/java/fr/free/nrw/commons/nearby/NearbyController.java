@@ -73,33 +73,8 @@ public class NearbyController {
                     places.get(0).location, // west
                     places.get(0).location};// east, init with a random location
 
-
             if (curLatLng != null) {
-                Timber.d("Sorting places by distance...");
-                final Map<Place, Double> distances = new HashMap<>();
-                for (Place place : places) {
-                    distances.put(place, computeDistanceBetween(place.location, curLatLng));
-                    // Find boundaries with basic find max approach
-                    if (place.location.getLatitude() < boundaryCoordinates[0].getLatitude()) {
-                        boundaryCoordinates[0] = place.location;
-                    }
-                    if (place.location.getLatitude() > boundaryCoordinates[1].getLatitude()) {
-                        boundaryCoordinates[1] = place.location;
-                    }
-                    if (place.location.getLongitude() < boundaryCoordinates[2].getLongitude()) {
-                        boundaryCoordinates[2] = place.location;
-                    }
-                    if (place.location.getLongitude() > boundaryCoordinates[3].getLongitude()) {
-                        boundaryCoordinates[3] = place.location;
-                    }
-                }
-                Collections.sort(places,
-                        (lhs, rhs) -> {
-                            double lhsDistance = distances.get(lhs);
-                            double rhsDistance = distances.get(rhs);
-                            return (int) (lhsDistance - rhsDistance);
-                        }
-                );
+                sortByDistance(boundaryCoordinates, places, curLatLng);
             }
             nearbyPlacesInfo.curLatLng = curLatLng;
             nearbyPlacesInfo.searchLatLng = searchLatLng;
@@ -118,13 +93,39 @@ public class NearbyController {
                     currentLocation = curLatLng;
                 }
             }
-
-
             return nearbyPlacesInfo;
         }
         else {
             return null;
         }
+    }
+
+    private void sortByDistance(LatLng[] boundaryCoordinates, List<Place> places, LatLng curLatLng) {
+        Timber.d("Sorting places by distance...");
+        final Map<Place, Double> distances = new HashMap<>();
+        for (Place place : places) {
+            distances.put(place, computeDistanceBetween(place.location, curLatLng));
+            // Find boundaries with basic find max approach
+            if (place.location.getLatitude() < boundaryCoordinates[0].getLatitude()) {
+                boundaryCoordinates[0] = place.location;
+            }
+            if (place.location.getLatitude() > boundaryCoordinates[1].getLatitude()) {
+                boundaryCoordinates[1] = place.location;
+            }
+            if (place.location.getLongitude() < boundaryCoordinates[2].getLongitude()) {
+                boundaryCoordinates[2] = place.location;
+            }
+            if (place.location.getLongitude() > boundaryCoordinates[3].getLongitude()) {
+                boundaryCoordinates[3] = place.location;
+            }
+        }
+        Collections.sort(places,
+            (lhs, rhs) -> {
+                double lhsDistance = distances.get(lhs);
+                double rhsDistance = distances.get(rhs);
+                return (int) (lhsDistance - rhsDistance);
+            }
+        );
     }
 
     /**
@@ -165,57 +166,62 @@ public class NearbyController {
 
         placeList = placeList.subList(0, Math.min(placeList.size(), MAX_RESULTS));
 
+        drawVector(placeList,curLatLng,baseMarkerOptions,context);
+
+        return baseMarkerOptions;
+    }
+    private static void drawVector(List<Place> placeList,
+        LatLng curLatLng, List<NearbyBaseMarker> baseMarkerOptions, Context context) {
+
         VectorDrawableCompat vectorDrawable = null;
         VectorDrawableCompat vectorDrawableGreen = null;
         VectorDrawableCompat vectorDrawableGrey = null;
-        vectorDrawable = null;
-        try {
-            vectorDrawable = VectorDrawableCompat.create(
-                    context.getResources(), R.drawable.ic_custom_map_marker, context.getTheme());
-            vectorDrawableGreen = VectorDrawableCompat.create(
-                    context.getResources(), R.drawable.ic_custom_map_marker_green, context.getTheme());
-            vectorDrawableGrey = VectorDrawableCompat.create(
-                    context.getResources(), R.drawable.ic_custom_map_marker_grey, context.getTheme());
-        } catch (Resources.NotFoundException e) {
-            // ignore when running tests.
-        }
+        tryDraw(vectorDrawable, vectorDrawableGreen, vectorDrawableGrey, context);
         if (vectorDrawable != null) {
             Bitmap icon = UiUtils.getBitmap(vectorDrawable);
             Bitmap iconGreen = UiUtils.getBitmap(vectorDrawableGreen);
             Bitmap iconGrey = UiUtils.getBitmap(vectorDrawableGrey);
-
             for (Place place : placeList) {
                 String distance = formatDistanceBetween(curLatLng, place.location);
                 place.setDistance(distance);
-
                 NearbyBaseMarker nearbyBaseMarker = new NearbyBaseMarker();
                 nearbyBaseMarker.title(place.name);
                 nearbyBaseMarker.position(
-                        new com.mapbox.mapboxsdk.geometry.LatLng(
-                                place.location.getLatitude(),
-                                place.location.getLongitude()));
+                    new com.mapbox.mapboxsdk.geometry.LatLng(
+                        place.location.getLatitude(),
+                        place.location.getLongitude()));
                 nearbyBaseMarker.place(place);
                 // Check if string is only spaces or empty, if so place doesn't have any picture
                 if (!place.pic.trim().isEmpty()) {
                     if (iconGreen != null) {
                         nearbyBaseMarker.icon(IconFactory.getInstance(context)
-                                .fromBitmap(iconGreen));
+                            .fromBitmap(iconGreen));
                     }
                 } else if (!place.destroyed.trim().isEmpty()) { // Means place is destroyed
                     if (iconGrey != null) {
                         nearbyBaseMarker.icon(IconFactory.getInstance(context)
-                                .fromBitmap(iconGrey));
+                            .fromBitmap(iconGrey));
                     }
                 } else {
                     nearbyBaseMarker.icon(IconFactory.getInstance(context)
-                            .fromBitmap(icon));
+                        .fromBitmap(icon));
                 }
-
                 baseMarkerOptions.add(nearbyBaseMarker);
             }
         }
-
-        return baseMarkerOptions;
+    }
+    private static void tryDraw(VectorDrawableCompat vectorDrawable, VectorDrawableCompat vectorDrawableGreen,
+        VectorDrawableCompat vectorDrawableGrey, Context context){
+        try {
+            vectorDrawable = VectorDrawableCompat.create(
+                context.getResources(), R.drawable.ic_custom_map_marker, context.getTheme());
+            vectorDrawableGreen = VectorDrawableCompat.create(
+                context.getResources(), R.drawable.ic_custom_map_marker_green, context.getTheme());
+            vectorDrawableGrey = VectorDrawableCompat.create(
+                context.getResources(), R.drawable.ic_custom_map_marker_grey, context.getTheme());
+        } catch (Resources.NotFoundException e) {
+            // ignore when running tests.
+        }
     }
 
     /**
