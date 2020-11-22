@@ -680,9 +680,6 @@ public class MediaDetailFragment extends CommonsDaggerSupportFragment implements
         if (AccountUtil.getUserName(getContext()) != null && AccountUtil.getUserName(getContext()).equals(media.getCreator())) {
             deleteWhenNotNull();
         }
-        //Reviewer correct me if i have misunderstood something over here
-        //But how does this  if (delete.getVisibility() == View.VISIBLE) {
-        //            enableDeleteButton(true);   makes sense ?
         else {
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
             alert.setMessage(
