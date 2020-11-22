@@ -126,4 +126,51 @@ class ReviewHelperTest {
 
         assertTrue(firstRevisionOfFile is MwQueryPage.Revision)
     }
+
+    /**
+     * Test tool tip that shows the info on page
+     */
+    @Test
+    fun checkToolTipBox(){
+
+        `when`(mediaClient?.checkPageExistsUsingTitle("showInfo"))
+            .thenReturn(Single.just(true))
+
+    }
+    /**
+     * Test scenario when all media is already nominated for deletion
+     */
+
+    @Test
+    fun checkshowSkipImageInfo(){
+
+        `when`(mediaClient?.checkPageExistsUsingTitle("showSkipImageInfo"))
+            .thenReturn(Single.just(true))
+
+    }
+
+    /**
+     * Test scenario when all media is already nominated for deletion
+     */
+
+    @Test
+    fun checkshowSeemsFineInfo(){
+
+        `when`(mediaClient?.checkPageExistsUsingTitle("showSeemsFineInfo"))
+            .thenReturn(Single.just(true))
+
+    }
+
+    /**
+     * Test scenario when all media is already nominated for deletion
+     */
+
+    @Test
+    fun checkReviewImageInfo(){
+
+        `when`(mediaClient?.checkPageExistsUsingTitle("showReviewImageInfo"))
+            .thenReturn(Single.just(true))
+
+    }
+
 }

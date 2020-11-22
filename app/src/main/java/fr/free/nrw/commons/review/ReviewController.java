@@ -70,21 +70,28 @@ public class ReviewController {
     }
 
     void reportSpam(@NonNull Activity activity, ReviewCallback reviewCallback) {
+        reasonForDelete(activity, reviewCallback);
+    }
+
+    private void reasonForDelete(@NonNull Activity activity,
+        ReviewCallback reviewCallback) {
+        deleteHelper(activity, reviewCallback, R.string.review_spam_report_question,
+            DeleteReason.SPAM);
+    }
+
+    private void deleteHelper(@NonNull Activity activity,
+        ReviewCallback reviewCallback, int p, DeleteReason spam) {
         Timber.d("Report spam for %s", media.getFilename());
         deleteHelper.askReasonAndExecute(media,
-                activity,
-                activity.getResources().getString(R.string.review_spam_report_question),
-                DeleteReason.SPAM,
-                reviewCallback);
+            activity,
+            activity.getResources().getString(p),
+            spam,
+            reviewCallback);
     }
 
     void reportPossibleCopyRightViolation(@NonNull Activity activity, ReviewCallback reviewCallback) {
-        Timber.d("Report spam for %s", media.getFilename());
-        deleteHelper.askReasonAndExecute(media,
-                activity,
-                activity.getResources().getString(R.string.review_c_violation_report_question),
-                DeleteReason.COPYRIGHT_VIOLATION,
-                reviewCallback);
+        deleteHelper(activity, reviewCallback, R.string.review_c_violation_report_question,
+            DeleteReason.COPYRIGHT_VIOLATION);
     }
 
     @SuppressLint("CheckResult")

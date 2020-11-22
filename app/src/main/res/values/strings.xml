@@ -697,4 +697,11 @@ Upload your first media by tapping on the add button.</string>
   <string name="limited_connection_enabled">Limited connection mode enabled!</string>
   <string name="limited_connection_disabled">Limited connection mode disabled. Pending uploads will resume now.</string>
   <string name="limited_connection">Limited Connection</string>
+  <string name="title_out_of_scope_info">Out of scope</string>
+  <string name="out_of_scope_explanation">Why is this image out of scope</string>
+  <string name="title_peer_review_information">Peer review information</string>
+  <string name="title_seems_fine_info">Seems fine information</string>
+  <string name="seems_fine_explanation">Seems fine means that the image shows up clearly and doesn\'t violate any copyright infringements</string>
+  <string name="title_skip_image_info">Skip Image Information</string>
+  <string name="skipping_image_explanation">Skipping this image means you can come back later to review it and another image that was uploaded within the last 24 hours will come up next</string>
 </resources>

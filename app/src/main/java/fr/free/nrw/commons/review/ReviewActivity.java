@@ -1,11 +1,15 @@
 package fr.free.nrw.commons.review;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -58,7 +62,7 @@ public class ReviewActivity extends NavigationBaseActivity {
     ReviewHelper reviewHelper;
     @Inject
     DeleteHelper deleteHelper;
-
+    public static final String PREFS_NAME = "MyPrefsFile";
     final String SAVED_MEDIA = "saved_media";
     private Media media;
 
@@ -97,7 +101,6 @@ public class ReviewActivity extends NavigationBaseActivity {
         setSupportActionBar(toolbar);
         initDrawer();
 
-
         reviewController = new ReviewController(deleteHelper, this);
 
         reviewPagerAdapter = new ReviewPagerAdapter(getSupportFragmentManager());
@@ -106,16 +109,31 @@ public class ReviewActivity extends NavigationBaseActivity {
         pagerIndicator.setViewPager(reviewPager);
         progressBar.setVisibility(View.VISIBLE);
 
-        Drawable d[]=btnSkipImage.getCompoundDrawablesRelative();
-        d[2].setColorFilter(getApplicationContext().getResources().getColor(R.color.button_blue), PorterDuff.Mode.SRC_IN);
+        Drawable d[] = btnSkipImage.getCompoundDrawablesRelative();
+        d[2].setColorFilter(getApplicationContext().getResources().getColor(R.color.button_blue),
+            PorterDuff.Mode.SRC_IN);
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME    , 0);
+        boolean dialogShown = settings.getBoolean("dialogShown", false);
 
+        if (!dialogShown) {
+            showReviewImageInfo();
 
-        if (savedInstanceState != null && savedInstanceState.getParcelable(SAVED_MEDIA)!=null) {
-            updateImage(savedInstanceState.getParcelable(SAVED_MEDIA)); // Use existing media if we have one
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("dialogShown", true);
+            editor.commit();
+        }
+
+        if (savedInstanceState != null && savedInstanceState.getParcelable(SAVED_MEDIA) != null) {
+            updateImage(
+                savedInstanceState.getParcelable(SAVED_MEDIA)); // Use existing media if we have one
         } else {
             runRandomizer(); //Run randomizer whenever everything is ready so that a first random image will be added
         }
 
+        btnSetup();
+    }
+
+    private void btnSetup() {
         btnSkipImage.setOnClickListener(view -> {
             reviewPagerAdapter.disableButtons();
             runRandomizer();
@@ -123,8 +141,8 @@ public class ReviewActivity extends NavigationBaseActivity {
 
         btnSkipImage.setOnTouchListener((view, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP && event.getRawX() >= (
-                    btnSkipImage.getRight() - btnSkipImage
-                            .getCompoundDrawables()[2].getBounds().width())) {
+                btnSkipImage.getRight() - btnSkipImage
+                    .getCompoundDrawables()[2].getBounds().width())) {
                 showSkipImageInfo();
                 return true;
             }
@@ -137,12 +155,12 @@ public class ReviewActivity extends NavigationBaseActivity {
         progressBar.setVisibility(View.VISIBLE);
         reviewPager.setCurrentItem(0);
         compositeDisposable.add(reviewHelper.getRandomMedia()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(media -> {
-                    reviewPagerAdapter.disableButtons();
-                    updateImage(media);
-                }));
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(media -> {
+                reviewPagerAdapter.disableButtons();
+                updateImage(media);
+            }));
         return true;
     }
 
@@ -159,16 +177,17 @@ public class ReviewActivity extends NavigationBaseActivity {
 
         reviewController.onImageRefreshed(media); //file name is updated
         compositeDisposable.add(reviewHelper.getFirstRevisionOfFile(fileName)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(revision -> {
-                    reviewController.firstRevision = revision;
-                    reviewPagerAdapter.updateFileInformation();
-                    String caption = String.format(getString(R.string.review_is_uploaded_by), fileName, revision.getUser());
-                    imageCaption.setText(caption);
-                    progressBar.setVisibility(View.GONE);
-                    reviewPagerAdapter.enableButtons();
-                }));
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(revision -> {
+                reviewController.firstRevision = revision;
+                reviewPagerAdapter.updateFileInformation();
+                @SuppressLint("StringFormatInvalid") String caption = String.format(getString(R.string.review_is_uploaded_by), fileName,
+                    revision.getUser());
+                imageCaption.setText(caption);
+                progressBar.setVisibility(View.GONE);
+                reviewPagerAdapter.enableButtons();
+            }));
         reviewPager.setCurrentItem(0);
     }
 
@@ -187,26 +206,59 @@ public class ReviewActivity extends NavigationBaseActivity {
         compositeDisposable.clear();
     }
 
-    public void showSkipImageInfo(){
+    public void showOutOfScopeInfo() {
+        dialogueHelper(getString(R.string.title_out_of_scope_info).toUpperCase(),
+            R.string.out_of_scope_explanation);
+    }
+
+    private void dialogueHelper(String s, int p) {
         DialogUtil.showAlertDialog(ReviewActivity.this,
-                getString(R.string.skip_image).toUpperCase(),
-                getString(R.string.skip_image_explanation),
-                getString(android.R.string.ok),
-                "",
-                null,
-                null);
+            s,
+            getString(p),
+            getString(android.R.string.ok),
+            "",
+            null,
+            null);
+    }
+
+    public void showSkipImageInfo() {
+        dialogueHelper(getString(R.string.title_skip_image_info),
+            R.string.skipping_image_explanation);
+    }
+
+    public void showSeemsFineInfo() {
+        dialogueHelper(getString(R.string.title_seems_fine_info), R.string.seems_fine_explanation);
     }
 
     public void showReviewImageInfo() {
-        DialogUtil.showAlertDialog(ReviewActivity.this,
-                getString(R.string.title_activity_review),
-                getString(R.string.review_image_explanation),
-                getString(android.R.string.ok),
-                "",
-                null,
-                null);
+        dialogueHelper(getString(R.string.title_peer_review_information),
+            R.string.review_image_explanation);
     }
 
+    public void showInfo(){
+
+        AlertDialog.Builder builder
+            = new AlertDialog
+            .Builder(ReviewActivity.this);
+        builder.setMessage("Click on one of the options for more information about the Wikimedia Commons Peer Review");
+        builder.setTitle("Wikimedia Commons Peer Review Help!");
+        builder.setCancelable(false);
+        builder
+            .setPositiveButton(
+                "Skip image information",
+                (dialog, which) -> showSkipImageInfo());
+        builder
+            .setNegativeButton(
+                "Out of scope information",
+                (dialog, which) -> showOutOfScopeInfo());
+        builder
+            .setNeutralButton(
+                "Seems fine information",
+                (dialog, which) -> showSeemsFineInfo());
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -219,9 +271,11 @@ public class ReviewActivity extends NavigationBaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_image_info:
-                showReviewImageInfo();
+                showInfo();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }
