@@ -144,11 +144,16 @@ public class ReviewImageFragment extends CommonsDaggerSupportFragment {
                 noButtonText = "no";
         }
 
+        setQuestionsandButtons(question, explanation, yesButtonText, noButtonText);
+        return layoutView;
+    }
+
+    public void setQuestionsandButtons(String question, String explanation, String yesButtonText,
+        String noButtonText) {
         textViewQuestion.setText(question);
         textViewQuestionContext.setText(explanation);
         yesButton.setText(yesButtonText);
         noButton.setText(noButtonText);
-        return layoutView;
     }
 
 

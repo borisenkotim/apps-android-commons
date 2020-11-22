@@ -121,6 +121,32 @@ class NearbyParentFragmentPresenterTest {
         verifyNoMoreInteractions(nearbyParentFragmentView)
     }
 
+    @Test
+    fun testWhiteTheme(){
+
+
+    }
+
+    @Test
+    fun testDarkTheme(){
+
+
+    }
+
+
+    @Test
+    fun testRecenterError(){
+
+
+    }
+
+
+    @Test
+    fun testChipStyle(){
+
+
+    }
+
     /**
      * Test updateMapAndList method updates parent fragment view with latest location of user
      * at significant location change

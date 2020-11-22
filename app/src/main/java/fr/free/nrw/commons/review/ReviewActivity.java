@@ -63,7 +63,7 @@ public class ReviewActivity extends NavigationBaseActivity {
     private Media media;
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         if (media != null) {
             outState.putParcelable(SAVED_MEDIA, media);
@@ -76,37 +76,34 @@ public class ReviewActivity extends NavigationBaseActivity {
      * @param context
      * @param title   Page title
      */
-    public static void startYourself(Context context, String title) {
-        Intent reviewActivity = new Intent(context, ReviewActivity.class);
+    public static void startYourself(final Context context, final String title) {
+        final Intent reviewActivity = new Intent(context, ReviewActivity.class);
         reviewActivity.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         reviewActivity.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         context.startActivity(reviewActivity);
     }
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public Media getMedia() {
         return media;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         initDrawer();
-
-
         reviewController = new ReviewController(deleteHelper, this);
-
         reviewPagerAdapter = new ReviewPagerAdapter(getSupportFragmentManager());
         reviewPager.setAdapter(reviewPagerAdapter);
         reviewPagerAdapter.getItem(0);
         pagerIndicator.setViewPager(reviewPager);
         progressBar.setVisibility(View.VISIBLE);
 
-        Drawable d[]=btnSkipImage.getCompoundDrawablesRelative();
+        final Drawable[] d =btnSkipImage.getCompoundDrawablesRelative();
         d[2].setColorFilter(getApplicationContext().getResources().getColor(R.color.button_blue), PorterDuff.Mode.SRC_IN);
 
 
@@ -116,6 +113,10 @@ public class ReviewActivity extends NavigationBaseActivity {
             runRandomizer(); //Run randomizer whenever everything is ready so that a first random image will be added
         }
 
+        btnSkipSettings();
+    }
+
+    public void btnSkipSettings() {
         btnSkipImage.setOnClickListener(view -> {
             reviewPagerAdapter.disableButtons();
             runRandomizer();
@@ -123,8 +124,8 @@ public class ReviewActivity extends NavigationBaseActivity {
 
         btnSkipImage.setOnTouchListener((view, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP && event.getRawX() >= (
-                    btnSkipImage.getRight() - btnSkipImage
-                            .getCompoundDrawables()[2].getBounds().width())) {
+                btnSkipImage.getRight() - btnSkipImage
+                    .getCompoundDrawables()[2].getBounds().width())) {
                 showSkipImageInfo();
                 return true;
             }
@@ -137,19 +138,19 @@ public class ReviewActivity extends NavigationBaseActivity {
         progressBar.setVisibility(View.VISIBLE);
         reviewPager.setCurrentItem(0);
         compositeDisposable.add(reviewHelper.getRandomMedia()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(media -> {
-                    reviewPagerAdapter.disableButtons();
-                    updateImage(media);
-                }));
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(media -> {
+                reviewPagerAdapter.disableButtons();
+                updateImage(media);
+            }));
         return true;
     }
 
     @SuppressLint("CheckResult")
-    private void updateImage(Media media) {
+    private void updateImage(final Media media) {
         this.media = media;
-        String fileName = media.getFilename();
+        final String fileName = media.getFilename();
         if (fileName.length() == 0) {
             ViewUtil.showShortSnackbar(drawerLayout, R.string.error_review);
             return;
@@ -159,21 +160,21 @@ public class ReviewActivity extends NavigationBaseActivity {
 
         reviewController.onImageRefreshed(media); //file name is updated
         compositeDisposable.add(reviewHelper.getFirstRevisionOfFile(fileName)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(revision -> {
-                    reviewController.firstRevision = revision;
-                    reviewPagerAdapter.updateFileInformation();
-                    String caption = String.format(getString(R.string.review_is_uploaded_by), fileName, revision.getUser());
-                    imageCaption.setText(caption);
-                    progressBar.setVisibility(View.GONE);
-                    reviewPagerAdapter.enableButtons();
-                }));
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(revision -> {
+                reviewController.firstRevision = revision;
+                reviewPagerAdapter.updateFileInformation();
+                final String caption = String.format(getString(R.string.review_is_uploaded_by), fileName, revision.getUser());
+                imageCaption.setText(caption);
+                progressBar.setVisibility(View.GONE);
+                reviewPagerAdapter.enableButtons();
+            }));
         reviewPager.setCurrentItem(0);
     }
 
     public void swipeToNext() {
-        int nextPos = reviewPager.getCurrentItem() + 1;
+        final int nextPos = reviewPager.getCurrentItem() + 1;
         if (nextPos <= 3) {
             reviewPager.setCurrentItem(nextPos);
         } else {
@@ -188,35 +189,35 @@ public class ReviewActivity extends NavigationBaseActivity {
     }
 
     public void showSkipImageInfo(){
-        DialogUtil.showAlertDialog(ReviewActivity.this,
-                getString(R.string.skip_image).toUpperCase(),
-                getString(R.string.skip_image_explanation),
-                getString(android.R.string.ok),
-                "",
-                null,
-                null);
+        DialogUtil.showAlertDialog(this,
+            getString(R.string.skip_image).toUpperCase(),
+            getString(R.string.skip_image_explanation),
+            getString(android.R.string.ok),
+            "",
+            null,
+            null);
     }
 
     public void showReviewImageInfo() {
-        DialogUtil.showAlertDialog(ReviewActivity.this,
-                getString(R.string.title_activity_review),
-                getString(R.string.review_image_explanation),
-                getString(android.R.string.ok),
-                "",
-                null,
-                null);
+        DialogUtil.showAlertDialog(this,
+            getString(R.string.title_activity_review),
+            getString(R.string.review_image_explanation),
+            getString(android.R.string.ok),
+            "",
+            null,
+            null);
     }
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_review_activty, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_image_info:
                 showReviewImageInfo();

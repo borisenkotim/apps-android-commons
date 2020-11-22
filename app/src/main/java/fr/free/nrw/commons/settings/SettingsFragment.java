@@ -81,11 +81,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
         // Disable some settings when not logged in.
         if (defaultKvStore.getBoolean("login_skipped", false)) {
-            findPreference("useExternalStorage").setEnabled(false);
-            findPreference("useAuthorName").setEnabled(false);
-            findPreference("displayNearbyCardView").setEnabled(false);
-            findPreference("displayLocationPermissionForCardView").setEnabled(false);
-            findPreference("displayCampaignsCardView").setEnabled(false);
+            findAuthenitcators();
         }
 
         findPreference("telemetryOptOut").setOnPreferenceChangeListener(
@@ -94,6 +90,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 defaultKvStore.putBoolean(Prefs.TELEMETRY_PREFERENCE,(boolean)newValue);
                 return true;
             });
+    }
+
+    public void findAuthenitcators() {
+        findPreference("useExternalStorage").setEnabled(false);
+        findPreference("useAuthorName").setEnabled(false);
+        findPreference("displayNearbyCardView").setEnabled(false);
+        findPreference("displayLocationPermissionForCardView").setEnabled(false);
+        findPreference("displayCampaignsCardView").setEnabled(false);
     }
 
     /**

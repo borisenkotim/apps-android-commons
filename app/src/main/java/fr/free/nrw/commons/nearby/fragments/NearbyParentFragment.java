@@ -114,6 +114,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import kotlin.Unit;
+import org.jetbrains.annotations.NotNull;
 import timber.log.Timber;
 
 
@@ -273,16 +274,24 @@ public class NearbyParentFragment extends CommonsDaggerSupportFragment
      */
     private void initThemePreferences() {
         if(isDarkTheme){
-            rvNearbyList.setBackgroundColor(getContext().getResources().getColor(R.color.contributionListDarkBackground));
-            checkBoxTriStates.setTextColor(getContext().getResources().getColor(android.R.color.white));
-            checkBoxTriStates.setTextColor(getContext().getResources().getColor(android.R.color.white));
-            nearbyFilterList.setBackgroundColor(getContext().getResources().getColor(R.color.contributionListDarkBackground));
+            setDark();
         }else{
-            rvNearbyList.setBackgroundColor(getContext().getResources().getColor(android.R.color.white));
-            checkBoxTriStates.setTextColor(getContext().getResources().getColor(R.color.contributionListDarkBackground));
-            nearbyFilterList.setBackgroundColor(getContext().getResources().getColor(android.R.color.white));
-            nearbyFilterList.setBackgroundColor(getContext().getResources().getColor(android.R.color.white));
+            setLight();
         }
+    }
+
+    private void setLight() {
+        rvNearbyList.setBackgroundColor(getContext().getResources().getColor(android.R.color.white));
+        checkBoxTriStates.setTextColor(getContext().getResources().getColor(R.color.contributionListDarkBackground));
+        nearbyFilterList.setBackgroundColor(getContext().getResources().getColor(android.R.color.white));
+        nearbyFilterList.setBackgroundColor(getContext().getResources().getColor(android.R.color.white));
+    }
+
+    private void setDark() {
+        rvNearbyList.setBackgroundColor(getContext().getResources().getColor(R.color.contributionListDarkBackground));
+        checkBoxTriStates.setTextColor(getContext().getResources().getColor(android.R.color.white));
+        checkBoxTriStates.setTextColor(getContext().getResources().getColor(android.R.color.white));
+        nearbyFilterList.setBackgroundColor(getContext().getResources().getColor(R.color.contributionListDarkBackground));
     }
 
     private void initRvNearbyList() {
@@ -492,14 +501,7 @@ public class NearbyParentFragment extends CommonsDaggerSupportFragment
     private void initFilterChips() {
         chipNeedsPhoto.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (NearbyController.currentLocation != null) {
-                checkBoxTriStates.setState(CheckBoxTriStates.UNKNOWN);
-                if (isChecked) {
-                    NearbyFilterState.setNeedPhotoSelected(true);
-                    presenter.filterByMarkerType(nearbyFilterSearchRecyclerViewAdapter.selectedLabels, checkBoxTriStates.getState(), true, false);
-                } else {
-                    NearbyFilterState.setNeedPhotoSelected(false);
-                    presenter.filterByMarkerType(nearbyFilterSearchRecyclerViewAdapter.selectedLabels, checkBoxTriStates.getState(), true, false);
-                }
+                checkStatus(isChecked);
             } else {
                 chipNeedsPhoto.setChecked(!isChecked);
             }
@@ -508,18 +510,22 @@ public class NearbyParentFragment extends CommonsDaggerSupportFragment
 
         chipExists.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (NearbyController.currentLocation != null) {
-                checkBoxTriStates.setState(CheckBoxTriStates.UNKNOWN);
-                if (isChecked) {
-                    NearbyFilterState.setExistsSelected(true);
-                    presenter.filterByMarkerType(nearbyFilterSearchRecyclerViewAdapter.selectedLabels, checkBoxTriStates.getState(), true, false);
-                } else {
-                    NearbyFilterState.setExistsSelected(false);
-                    presenter.filterByMarkerType(nearbyFilterSearchRecyclerViewAdapter.selectedLabels, checkBoxTriStates.getState(), true, false);
-                }
+                checkStatus(isChecked);
             } else {
                 chipExists.setChecked(!isChecked);
             }
         });
+    }
+
+    private void checkStatus(boolean isChecked) {
+        checkBoxTriStates.setState(CheckBoxTriStates.UNKNOWN);
+        if (isChecked) {
+            NearbyFilterState.setNeedPhotoSelected(true);
+            presenter.filterByMarkerType(nearbyFilterSearchRecyclerViewAdapter.selectedLabels, checkBoxTriStates.getState(), true, false);
+        } else {
+            NearbyFilterState.setNeedPhotoSelected(false);
+            presenter.filterByMarkerType(nearbyFilterSearchRecyclerViewAdapter.selectedLabels, checkBoxTriStates.getState(), true, false);
+        }
     }
 
     /**
@@ -751,12 +757,17 @@ public class NearbyParentFragment extends CommonsDaggerSupportFragment
                             lastFocusLocation=searchLatLng;
                         },
                         throwable -> {
-                            Timber.d(throwable);
-                            showErrorMessage(getString(R.string.error_fetching_nearby_places)+throwable.getLocalizedMessage());
-                            setProgressBarVisibility(false);
-                            presenter.lockUnlockNearby(false);
+                            locationError(throwable);
                             setFilterState();
                         }));
+    }
+
+    private void locationError(Throwable throwable) {
+        Timber.d(throwable);
+        showErrorMessage(
+            getString(R.string.error_fetching_nearby_places) + throwable.getLocalizedMessage());
+        setProgressBarVisibility(false);
+        presenter.lockUnlockNearby(false);
     }
 
     private void populatePlacesForAnotherLocation(final fr.free.nrw.commons.location.LatLng curlatLng,
@@ -770,10 +781,7 @@ public class NearbyParentFragment extends CommonsDaggerSupportFragment
                             lastFocusLocation=searchLatLng;
                         },
                         throwable -> {
-                            Timber.d(throwable);
-                            showErrorMessage(getString(R.string.error_fetching_nearby_places)+throwable.getLocalizedMessage());
-                            setProgressBarVisibility(false);
-                            presenter.lockUnlockNearby(false);
+                            locationError(throwable);
                         }));
     }
 
@@ -1276,28 +1284,29 @@ public class NearbyParentFragment extends CommonsDaggerSupportFragment
         final CameraPosition position;
 
         if (ViewUtil.isPortrait(getActivity())) {
-            position = new CameraPosition.Builder()
-                    .target(isListBottomSheetExpanded() ?
-                            new LatLng(curLatLng.getLatitude() - CAMERA_TARGET_SHIFT_FACTOR_PORTRAIT,
-                                    curLatLng.getLongitude())
-                            : new LatLng(curLatLng.getLatitude(), curLatLng.getLongitude(), 0)) // Sets the new camera position
-                    .zoom(isListBottomSheetExpanded() ?
-                            ZOOM_LEVEL
-                            : mapBox.getCameraPosition().zoom) // Same zoom level
-                    .build();
+            position = getCameraPosition(curLatLng, CAMERA_TARGET_SHIFT_FACTOR_PORTRAIT);
         } else {
-            position = new CameraPosition.Builder()
-                    .target(isListBottomSheetExpanded() ?
-                            new LatLng(curLatLng.getLatitude() - CAMERA_TARGET_SHIFT_FACTOR_LANDSCAPE,
-                                    curLatLng.getLongitude())
-                            : new LatLng(curLatLng.getLatitude(), curLatLng.getLongitude(), 0)) // Sets the new camera position
-                    .zoom(isListBottomSheetExpanded() ?
-                            ZOOM_LEVEL
-                            : mapBox.getCameraPosition().zoom) // Same zoom level
-                    .build();
+            position = getCameraPosition(curLatLng, CAMERA_TARGET_SHIFT_FACTOR_LANDSCAPE);
         }
 
         mapBox.animateCamera(CameraUpdateFactory.newCameraPosition(position), 1000);
+    }
+
+    @NotNull
+    public CameraPosition getCameraPosition(fr.free.nrw.commons.location.LatLng curLatLng,
+        double camera_target_shift_factor) {
+        CameraPosition position;
+        position = new CameraPosition.Builder()
+            .target(isListBottomSheetExpanded() ?
+                new LatLng(curLatLng.getLatitude() - camera_target_shift_factor,
+                    curLatLng.getLongitude())
+                : new LatLng(curLatLng.getLatitude(), curLatLng.getLongitude(),
+                    0)) // Sets the new camera position
+            .zoom(isListBottomSheetExpanded() ?
+                ZOOM_LEVEL
+                : mapBox.getCameraPosition().zoom) // Same zoom level
+            .build();
+        return position;
     }
 
     @Override
