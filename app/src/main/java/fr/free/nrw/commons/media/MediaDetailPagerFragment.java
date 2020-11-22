@@ -222,12 +222,8 @@ public class MediaDetailPagerFragment extends CommonsDaggerSupportFragment imple
                 final int position = pager.getCurrentItem();
                 Media m = provider.getMediaAtPosition(position);
                 if (m != null) {
-                    // Enable default set of actions, then re-enable different set of actions only if it is a failed contrib
-                    menu.findItem(R.id.menu_browser_current_image).setEnabled(true).setVisible(true);
-                    menu.findItem(R.id.menu_share_current_image).setEnabled(true).setVisible(true);
-                    menu.findItem(R.id.menu_download_current_image).setEnabled(true).setVisible(true);
-                    menu.findItem(R.id.menu_bookmark_current_image).setEnabled(true).setVisible(true);
-                    menu.findItem(R.id.menu_set_as_wallpaper).setEnabled(true).setVisible(true);
+                    // Enable default actions
+                    this.enableDefaultActions(menu);
 
                     // Initialize bookmark object
                     bookmark = new Bookmark(
@@ -237,41 +233,68 @@ public class MediaDetailPagerFragment extends CommonsDaggerSupportFragment imple
                     );
                     updateBookmarkState(menu.findItem(R.id.menu_bookmark_current_image));
                     final Integer contributionState = provider.getContributionStateAt(position);
+
+                    // Re-enable actions if the contribution failed
                     if (contributionState != null) {
-                        switch (contributionState) {
-                            case Contribution.STATE_FAILED:
-                            case Contribution.STATE_IN_PROGRESS:
-                            case Contribution.STATE_QUEUED:
-                                menu.findItem(R.id.menu_browser_current_image).setEnabled(false)
-                                        .setVisible(false);
-                                menu.findItem(R.id.menu_share_current_image).setEnabled(false)
-                                        .setVisible(false);
-                                menu.findItem(R.id.menu_download_current_image).setEnabled(false)
-                                        .setVisible(false);
-                                menu.findItem(R.id.menu_bookmark_current_image).setEnabled(false)
-                                        .setVisible(false);
-                                menu.findItem(R.id.menu_set_as_wallpaper).setEnabled(false)
-                                        .setVisible(false);
-                                break;
-                            case Contribution.STATE_COMPLETED:
-                                // Default set of menu items works fine. Treat same as regular media object
-                                break;
-                        }
+                        this.reEnableFailedActions(menu, contributionState);
                     }
-                } else {
-                    menu.findItem(R.id.menu_browser_current_image).setEnabled(false)
-                            .setVisible(false);
-                    menu.findItem(R.id.menu_share_current_image).setEnabled(false)
-                            .setVisible(false);
-                    menu.findItem(R.id.menu_download_current_image).setEnabled(false)
-                            .setVisible(false);
-                    menu.findItem(R.id.menu_bookmark_current_image).setEnabled(false)
-                            .setVisible(false);
-                    menu.findItem(R.id.menu_set_as_wallpaper).setEnabled(false)
-                            .setVisible(false);
+                } else { // Media was successfully uploaded
+                    this.enableSuccessActions(menu);
                 }
             }
         }
+    }
+
+    // Enable default set of actions, then re-enable different set of actions only if it is a failed contrib
+    private void enableDefaultActions(Menu menu) {
+        menu.findItem(R.id.menu_browser_current_image).setEnabled(true).setVisible(true);
+        menu.findItem(R.id.menu_share_current_image).setEnabled(true).setVisible(true);
+        menu.findItem(R.id.menu_download_current_image).setEnabled(true).setVisible(true);
+        menu.findItem(R.id.menu_bookmark_current_image).setEnabled(true).setVisible(true);
+        menu.findItem(R.id.menu_set_as_wallpaper).setEnabled(true).setVisible(true);
+
+        menu.findItem(R.id.menu_browser_current_image).setEnabled(true).setVisible(true);
+        menu.findItem(R.id.menu_share_current_image).setEnabled(true).setVisible(true);
+        menu.findItem(R.id.menu_download_current_image).setEnabled(true).setVisible(true);
+        menu.findItem(R.id.menu_bookmark_current_image).setEnabled(true).setVisible(true);
+        menu.findItem(R.id.menu_set_as_wallpaper).setEnabled(true).setVisible(true);
+    }
+
+    // Disable actions for queued media
+    private void reEnableFailedActions(Menu menu, Integer contributionState) {
+        switch (contributionState) {
+            case Contribution.STATE_FAILED:
+            case Contribution.STATE_IN_PROGRESS:
+            case Contribution.STATE_QUEUED:
+                menu.findItem(R.id.menu_browser_current_image).setEnabled(false)
+                    .setVisible(false);
+                menu.findItem(R.id.menu_share_current_image).setEnabled(false)
+                    .setVisible(false);
+                menu.findItem(R.id.menu_download_current_image).setEnabled(false)
+                    .setVisible(false);
+                menu.findItem(R.id.menu_bookmark_current_image).setEnabled(false)
+                    .setVisible(false);
+                menu.findItem(R.id.menu_set_as_wallpaper).setEnabled(false)
+                    .setVisible(false);
+                break;
+            case Contribution.STATE_COMPLETED:
+                // Default set of menu items works fine. Treat same as regular media object
+                break;
+        }
+    }
+
+    // Enable actions for media that was uploaded successfully
+    private void enableSuccessActions(Menu menu) {
+        menu.findItem(R.id.menu_browser_current_image).setEnabled(false)
+            .setVisible(false);
+        menu.findItem(R.id.menu_share_current_image).setEnabled(false)
+            .setVisible(false);
+        menu.findItem(R.id.menu_download_current_image).setEnabled(false)
+            .setVisible(false);
+        menu.findItem(R.id.menu_bookmark_current_image).setEnabled(false)
+            .setVisible(false);
+        menu.findItem(R.id.menu_set_as_wallpaper).setEnabled(false)
+            .setVisible(false);
     }
 
     private void updateBookmarkState(MenuItem item) {
