@@ -16,12 +16,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -92,7 +88,7 @@ public class UploadActivity extends BaseActivity implements UploadContract.View,
 
     private CompositeDisposable compositeDisposable;
     private ProgressDialog progressDialog;
-    private UploadImageAdapter uploadImagesAdapter;
+    private UploadInterface.UploadImageAdapter uploadImagesAdapter;
     private List<UploadBaseFragment> fragments;
     private UploadCategoriesFragment uploadCategoriesFragment;
     private DepictsFragment depictsFragment;
@@ -142,7 +138,7 @@ public class UploadActivity extends BaseActivity implements UploadContract.View,
     }
 
     private void initViewPager() {
-        uploadImagesAdapter = new UploadImageAdapter(getSupportFragmentManager());
+        uploadImagesAdapter = new UploadInterface.UploadImageAdapter(getSupportFragmentManager());
         vpUpload.setAdapter(uploadImagesAdapter);
         vpUpload.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -288,15 +284,10 @@ public class UploadActivity extends BaseActivity implements UploadContract.View,
             //TODO: Confirm if handling manual permission enabled is required
         }
     }
-
     private void receiveSharedItems() {
         Intent intent = getIntent();
         String action = intent.getAction();
-        if (Intent.ACTION_SEND.equals(action) || Intent.ACTION_SEND_MULTIPLE.equals(action)) {
-            receiveExternalSharedItems();
-        } else if (ACTION_INTERNAL_UPLOADS.equals(action)) {
-            receiveInternalSharedItems();
-        }
+        intenActionCheck(action);
 
         if (uploadableFiles == null || uploadableFiles.isEmpty()) {
             handleNullMedia();
@@ -311,59 +302,70 @@ public class UploadActivity extends BaseActivity implements UploadContract.View,
             tvTopCardTitle.setText(getResources()
                     .getQuantityString(R.plurals.upload_count_title, uploadableFiles.size(), uploadableFiles.size()));
 
-            fragments = new ArrayList<>();
-            for (UploadableFile uploadableFile : uploadableFiles) {
-                UploadMediaDetailFragment uploadMediaDetailFragment = new UploadMediaDetailFragment();
-                uploadMediaDetailFragment.setImageTobeUploaded(uploadableFile, place);
-                uploadMediaDetailFragment.setCallback(new UploadMediaDetailFragmentCallback() {
-                    @Override
-                    public void deletePictureAtIndex(int index) {
-                        presenter.deletePictureAtIndex(index);
-                    }
+            checkButtonClicked();
 
-                    @Override
-                    public void onNextButtonClicked(int index) {
-                        UploadActivity.this.onNextButtonClicked(index);
-                    }
+            setCallbackAndFragments();
+        }
+    }
 
-                    @Override
-                    public void onPreviousButtonClicked(int index) {
-                        UploadActivity.this.onPreviousButtonClicked(index);
-                    }
+    public void checkButtonClicked() {
+        fragments = new ArrayList<>();
+        for (UploadableFile uploadableFile : uploadableFiles) {
+            UploadMediaDetailFragment uploadMediaDetailFragment = new UploadMediaDetailFragment();
+            uploadMediaDetailFragment.setImageTobeUploaded(uploadableFile, place);
+            uploadMediaDetailFragment.setCallback(new UploadMediaDetailFragmentCallback() {
+                @Override
+                public void deletePictureAtIndex(int index) {
+                    presenter.deletePictureAtIndex(index);
+                }
+                @Override
+                public void onNextButtonClicked(int index) {
+                    UploadActivity.this.onNextButtonClicked(index);
+                }
+                @Override
+                public void onPreviousButtonClicked(int index) {
+                    UploadActivity.this.onPreviousButtonClicked(index);
+                }
+                @Override
+                public void showProgress(boolean shouldShow) {
+                    UploadActivity.this.showProgress(shouldShow);
+                }
+                @Override
+                public int getIndexInViewFlipper(UploadBaseFragment fragment) {
+                    return fragments.indexOf(fragment);
+                }
+                @Override
+                public int getTotalNumberOfSteps() {
+                    return fragments.size();
+                }
+            });
+            fragments.add(uploadMediaDetailFragment);
+        }
+    }
 
-                    @Override
-                    public void showProgress(boolean shouldShow) {
-                        UploadActivity.this.showProgress(shouldShow);
-                    }
+    private void setCallbackAndFragments() {
+        uploadCategoriesFragment = new UploadCategoriesFragment();
+        uploadCategoriesFragment.setCallback(this);
 
-                    @Override
-                    public int getIndexInViewFlipper(UploadBaseFragment fragment) {
-                        return fragments.indexOf(fragment);
-                    }
+        depictsFragment = new DepictsFragment();
+        depictsFragment.setCallback(this);
 
-                    @Override
-                    public int getTotalNumberOfSteps() {
-                        return fragments.size();
-                    }
-                });
-                fragments.add(uploadMediaDetailFragment);
-            }
+        mediaLicenseFragment = new MediaLicenseFragment();
+        mediaLicenseFragment.setCallback(this);
 
-            uploadCategoriesFragment = new UploadCategoriesFragment();
-            uploadCategoriesFragment.setCallback(this);
+        fragments.add(depictsFragment);
+        fragments.add(uploadCategoriesFragment);
+        fragments.add(mediaLicenseFragment);
 
-            depictsFragment = new DepictsFragment();
-            depictsFragment.setCallback(this);
+        uploadImagesAdapter.setFragments(fragments);
+        vpUpload.setOffscreenPageLimit(fragments.size());
+    }
 
-            mediaLicenseFragment = new MediaLicenseFragment();
-            mediaLicenseFragment.setCallback(this);
-
-            fragments.add(depictsFragment);
-            fragments.add(uploadCategoriesFragment);
-            fragments.add(mediaLicenseFragment);
-
-            uploadImagesAdapter.setFragments(fragments);
-            vpUpload.setOffscreenPageLimit(fragments.size());
+    private void intenActionCheck(String action) {
+        if (Intent.ACTION_SEND.equals(action) || Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+            receiveExternalSharedItems();
+        } else if (ACTION_INTERNAL_UPLOADS.equals(action)) {
+            receiveInternalSharedItems();
         }
     }
 
@@ -424,39 +426,6 @@ public class UploadActivity extends BaseActivity implements UploadContract.View,
         if (index != 0) {
             vpUpload.setCurrentItem(index - 1, true);
             fragments.get(index - 1).onBecameVisible();
-        }
-    }
-
-    /**
-     * The adapter used to show image upload intermediate fragments
-     */
-
-    private class UploadImageAdapter extends FragmentStatePagerAdapter {
-        List<UploadBaseFragment> fragments;
-
-        public UploadImageAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-            this.fragments = new ArrayList<>();
-        }
-
-        public void setFragments(List<UploadBaseFragment> fragments) {
-            this.fragments = fragments;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return fragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return fragments.size();
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            return PagerAdapter.POSITION_NONE;
         }
     }
 

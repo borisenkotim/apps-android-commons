@@ -102,6 +102,11 @@ class UploadPresenterTest {
         uploadableFiles.clear()
     }
 
+    @Test
+    private fun deleteAllBaseTest(){
+        verify(uploadableFiles.clear())
+    }
+
     /**
      * Test which asserts If the next fragment to be shown is not one of the MediaDetailsFragment, lets hide the top card
      */
@@ -125,6 +130,18 @@ class UploadPresenterTest {
         verify(view).showHideTopCard(false)
         verify(repository).deletePicture(ArgumentMatchers.anyString())
         verify(view).showMessage(ArgumentMatchers.anyInt())//As there is only one while which we are asking for deletion, upload should be cancelled and this flow should be triggered
+        verify(view).finish()
+    }
+
+    /**
+     * Testnew media deletion during single upload
+     */
+    @Test
+    fun testDeleteWhenSingleUploadNewMethod(){
+        deletePictureBaseTest()
+        uploadableFiles.add(uploadableFile)
+        uploadPresenter.deletePictureAtIndex(0)
+        verify(view).showMessage(ArgumentMatchers.anyInt())
         verify(view).finish()
     }
 

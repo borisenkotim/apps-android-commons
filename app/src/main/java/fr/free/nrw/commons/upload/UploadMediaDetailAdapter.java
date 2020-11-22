@@ -110,21 +110,29 @@ public class UploadMediaDetailAdapter extends RecyclerView.Adapter<UploadMediaDe
             descItemEditText.setText(uploadMediaDetail.getDescriptionText());
 
             if (position == 0) {
-                captionInputLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-                captionInputLayout.setEndIconDrawable(R.drawable.mapbox_info_icon_default);
-                captionInputLayout.setEndIconOnClickListener(v ->
-                    callback.showAlert(R.string.media_detail_caption, R.string.caption_info));
-
-                descInputLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-                descInputLayout.setEndIconDrawable(R.drawable.mapbox_info_icon_default);
-                descInputLayout.setEndIconOnClickListener(v ->
-                    callback.showAlert(R.string.media_detail_description, R.string.description_info));
-
+                positionHandler(captionInputLayout, R.string.media_detail_caption,
+                    R.string.caption_info);
+                positionHandler(descInputLayout, R.string.media_detail_description,
+                    R.string.description_info);
             } else {
                 captionInputLayout.setEndIconDrawable(null);
                 descInputLayout.setEndIconDrawable(null);
             }
 
+            editTextItem(position, uploadMediaDetail);
+            userManuallyadded(uploadMediaDetail);
+        }
+
+        private void userManuallyadded(UploadMediaDetail uploadMediaDetail) {
+            //If the description was manually added by the user, it deserves focus, if not, let the user decide
+            if (uploadMediaDetail.isManuallyAdded()) {
+                captionItemEditText.requestFocus();
+            } else {
+                captionItemEditText.clearFocus();
+            }
+        }
+
+        private void editTextItem(int position, UploadMediaDetail uploadMediaDetail) {
             captionItemEditText.addTextChangedListener(new AbstractTextWatcher(
                     captionText -> uploadMediaDetails.get(position).setCaptionText(captionText)));
             initLanguageSpinner(position, uploadMediaDetail);
@@ -132,13 +140,13 @@ public class UploadMediaDetailAdapter extends RecyclerView.Adapter<UploadMediaDe
             descItemEditText.addTextChangedListener(new AbstractTextWatcher(
                     descriptionText -> uploadMediaDetails.get(position).setDescriptionText(descriptionText)));
             initLanguageSpinner(position, uploadMediaDetail);
+        }
 
-            //If the description was manually added by the user, it deserves focus, if not, let the user decide
-            if (uploadMediaDetail.isManuallyAdded()) {
-                captionItemEditText.requestFocus();
-            } else {
-                captionItemEditText.clearFocus();
-            }
+        private void positionHandler(TextInputLayout captionInputLayout, int p, int p2) {
+            captionInputLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+            captionInputLayout.setEndIconDrawable(R.drawable.mapbox_info_icon_default);
+            captionInputLayout.setEndIconOnClickListener(v ->
+                callback.showAlert(p, p2));
         }
 
         /**
@@ -174,6 +182,11 @@ public class UploadMediaDetailAdapter extends RecyclerView.Adapter<UploadMediaDe
                 }
             });
 
+            languageHandler(position, description, languagesAdapter);
+        }
+
+        private void languageHandler(int position, UploadMediaDetail description,
+            SpinnerLanguagesAdapter languagesAdapter) {
             if (description.getSelectedLanguageIndex() == -1) {
                 if (!TextUtils.isEmpty(savedLanguageValue)) {
                     // If user has chosen a default language from settings activity savedLanguageValue is not null

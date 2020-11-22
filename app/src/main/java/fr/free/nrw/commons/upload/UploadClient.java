@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.jetbrains.annotations.NotNull;
 import org.wikipedia.csrf.CsrfTokenClient;
 import org.wikipedia.dataclient.mwapi.MwException;
 import timber.log.Timber;
@@ -80,6 +81,18 @@ public class UploadClient {
     if (contribution.getChunkInfo() != null && isStashValid(contribution)) {
       chunkInfo.set(contribution.getChunkInfo());
     }
+    compositHandler(filename, contribution, notificationUpdater, file, fileChunks, mediaType, index,
+        chunkInfo);
+
+    chunkInfo.get().setLastChunkUploaded(true);
+    notificationUpdater.onChunkUploaded(contribution, chunkInfo.get());
+    return getStashUploadResultObservable(chunkInfo);
+  }
+
+  private void compositHandler(String filename, Contribution contribution,
+      NotificationUpdateProgressListener notificationUpdater, File file,
+      Observable<File> fileChunks, MediaType mediaType, AtomicInteger index,
+      AtomicReference<ChunkInfo> chunkInfo) {
     compositeDisposable.add(fileChunks.forEach(chunkFile -> {
       if (pauseUploads) {
         return;
@@ -110,9 +123,11 @@ public class UploadClient {
         Timber.e(throwable, "Error occurred in uploading chunk");
       }));
     }));
+  }
 
-    chunkInfo.get().setLastChunkUploaded(true);
-    notificationUpdater.onChunkUploaded(contribution, chunkInfo.get());
+  @NotNull
+  private Observable<StashUploadResult> getStashUploadResultObservable(
+      AtomicReference<ChunkInfo> chunkInfo) {
     if (pauseUploads) {
       return Observable.just(new StashUploadResult(StashUploadState.PAUSED, null));
     } else if (chunkInfo.get() != null) {

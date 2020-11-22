@@ -403,15 +403,22 @@ public class UploadService extends CommonsDaggerService {
   @SuppressWarnings("deprecation")
   private void showFailedNotification(Contribution contribution) {
     final String displayTitle = contribution.getMedia().getDisplayTitle();
-    curNotification.setTicker(getString(R.string.upload_failed_notification_title, displayTitle))
-        .setContentTitle(getString(R.string.upload_failed_notification_title, displayTitle))
-        .setContentText(getString(R.string.upload_failed_notification_subtitle))
+    stateNotify(contribution, displayTitle, R.string.upload_failed_notification_title,
+        R.string.upload_failed_notification_subtitle, NOTIFICATION_UPLOAD_FAILED,
+        Contribution.STATE_FAILED);
+  }
+
+  private void stateNotify(Contribution contribution, String displayTitle, int p, int p2,
+      int notificationUploadFailed, int stateFailed) {
+    curNotification.setTicker(getString(p, displayTitle))
+        .setContentTitle(getString(p, displayTitle))
+        .setContentText(getString(p2))
         .setProgress(0, 0, false)
         .setOngoing(false);
-    notificationManager.notify(contribution.getLocalUri().toString(), NOTIFICATION_UPLOAD_FAILED,
+    notificationManager.notify(contribution.getLocalUri().toString(), notificationUploadFailed,
         curNotification.build());
 
-    contribution.setState(Contribution.STATE_FAILED);
+    contribution.setState(stateFailed);
 
     compositeDisposable.add(contributionDao
         .update(contribution)
@@ -421,20 +428,9 @@ public class UploadService extends CommonsDaggerService {
 
   private void showPausedNotification(Contribution contribution) {
     final String displayTitle = contribution.getMedia().getDisplayTitle();
-    curNotification.setTicker(getString(R.string.upload_paused_notification_title, displayTitle))
-        .setContentTitle(getString(R.string.upload_paused_notification_title, displayTitle))
-        .setContentText(getString(R.string.upload_paused_notification_subtitle))
-        .setProgress(0, 0, false)
-        .setOngoing(false);
-    notificationManager.notify(contribution.getLocalUri().toString(), NOTIFICATION_UPLOAD_PAUSED,
-        curNotification.build());
-
-    contribution.setState(Contribution.STATE_PAUSED);
-
-    compositeDisposable.add(contributionDao
-        .update(contribution)
-        .subscribeOn(ioThreadScheduler)
-        .subscribe());
+    stateNotify(contribution, displayTitle, R.string.upload_paused_notification_title,
+        R.string.upload_paused_notification_subtitle, NOTIFICATION_UPLOAD_PAUSED,
+        Contribution.STATE_PAUSED);
   }
 
   private String findUniqueFilename(String fileName) throws IOException {

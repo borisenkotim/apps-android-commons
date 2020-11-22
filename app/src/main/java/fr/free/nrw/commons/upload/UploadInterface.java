@@ -2,8 +2,14 @@ package fr.free.nrw.commons.upload;
 
 import androidx.annotation.NonNull;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 import com.google.gson.JsonObject;
 import io.reactivex.Observable;
+import java.util.ArrayList;
+import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Field;
@@ -35,4 +41,37 @@ public interface UploadInterface {
       @NonNull @Field("comment") String comment,
       @NonNull @Field("filename") String filename,
       @NonNull @Field("filekey") String filekey);
+
+  /**
+   * The adapter used to show image upload intermediate fragments
+   */
+
+  class UploadImageAdapter extends FragmentStatePagerAdapter {
+      List<UploadBaseFragment> fragments;
+
+      public UploadImageAdapter(FragmentManager fragmentManager) {
+          super(fragmentManager);
+          this.fragments = new ArrayList<>();
+      }
+
+      public void setFragments(List<UploadBaseFragment> fragments) {
+          this.fragments = fragments;
+          notifyDataSetChanged();
+      }
+
+      @Override
+      public Fragment getItem(int position) {
+          return fragments.get(position);
+      }
+
+      @Override
+      public int getCount() {
+          return fragments.size();
+      }
+
+      @Override
+      public int getItemPosition(Object object) {
+          return PagerAdapter.POSITION_NONE;
+      }
+  }
 }

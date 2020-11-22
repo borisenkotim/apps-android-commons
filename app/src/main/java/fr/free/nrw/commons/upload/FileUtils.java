@@ -116,16 +116,25 @@ public class FileUtils {
     public static boolean deleteFile(File file) {
         boolean deletedAll = true;
         if (file != null) {
-            if (file.isDirectory()) {
-                String[] children = file.list();
-                for (String child : children) {
-                    deletedAll = deleteFile(new File(file, child)) && deletedAll;
-                }
-            } else {
-                deletedAll = file.delete();
-            }
+            deletedAll = fileHandler(file, deletedAll);
         }
+        return deletedAll;
+    }
 
+    private static boolean fileHandler(File file, boolean deletedAll) {
+        if (file.isDirectory()) {
+            deletedAll = isDeletedAll(file, deletedAll);
+        } else {
+            deletedAll = file.delete();
+        }
+        return deletedAll;
+    }
+
+    private static boolean isDeletedAll(File file, boolean deletedAll) {
+        String[] children = file.list();
+        for (String child : children) {
+            deletedAll = deleteFile(new File(file, child)) && deletedAll;
+        }
         return deletedAll;
     }
 

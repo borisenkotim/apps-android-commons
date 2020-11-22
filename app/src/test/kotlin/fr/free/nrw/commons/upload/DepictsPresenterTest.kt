@@ -138,4 +138,5 @@ class DepictsPresenterTest {
         depictsPresenter.verifyDepictions()
         verify(view).noDepictionSelected()
     }
+
 }

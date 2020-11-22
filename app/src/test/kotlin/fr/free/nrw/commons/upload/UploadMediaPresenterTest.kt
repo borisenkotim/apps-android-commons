@@ -55,6 +55,9 @@ class UploadMediaPresenterTest {
     @Mock
     private lateinit var jsonKvStore: JsonKvStore
 
+    @Mock
+    internal var activity: UploadActivity? = null
+
     /**
      * initial setup unit test environment
      */
@@ -216,6 +219,7 @@ class UploadMediaPresenterTest {
     }
 
 
+
     /**
      * Test show SimilarImageFragment
      */
@@ -225,5 +229,16 @@ class UploadMediaPresenterTest {
         uploadMediaPresenter.showSimilarImageFragment("original", "possible", similar)
         verify(view).showSimilarImageFragment("original", "possible", similar)
     }
+
+    @Test
+    fun showButtonClicked() {
+
+        val uploadMediaDetail = UploadMediaDetail()
+        uploadMediaDetail.captionText = "added caption"
+        uploadMediaDetail.languageCode = "en"
+        verify(activity)?.checkButtonClicked()
+    }
+
+
 
 }
