@@ -143,15 +143,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         langListPreference.setEntries(languageNames);
         langListPreference.setEntryValues(languageCodes);
 
-        // Gets current language code from shared preferences
-        String languageCode = getCurrentLanguageCode();
-        if (languageCode.equals("")){
-            // If current language code is empty, means none selected by user yet so use phone local
-            langListPreference.setValue(Locale.getDefault().getLanguage());
-        } else {
-            // If any language is selected by user previously, use it
-            langListPreference.setValue(languageCode);
-        }
+        langListPreference.setValue(this.getCurrentLanguageCode());
 
         langListPreference.setOnPreferenceChangeListener((preference, newValue) -> {
             String userSelectedValue = (String) newValue;
@@ -164,8 +156,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         defaultKvStore.putString(Prefs.KEY_LANGUAGE_VALUE, userSelectedValue);
     }
 
+    // If current language code is empty, means none selected by user yet so use phone local
+    // Else use the language that was selected by user previously
     private String getCurrentLanguageCode() {
-        return defaultKvStore.getString(Prefs.KEY_LANGUAGE_VALUE, "");
+        String languageCode = defaultKvStore.getString(Prefs.KEY_LANGUAGE_VALUE, "");
+
+        return languageCode == ("") ? Locale.getDefault().getLanguage() : languageCode;
     }
 
     private List<Language> getLanguagesSupportedByDevice() {
