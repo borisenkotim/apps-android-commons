@@ -19,15 +19,6 @@ public class EditorTaskCounts {
     @Nullable @SerializedName("targets_passed") private JsonElement targetsPassed;
     @Nullable private JsonElement targets;
 
-    @NonNull
-    public Map<String, Integer> getDescriptionEditsPerLanguage() {
-        Map<String, Integer> editsPerLanguage = null;
-        if (counts != null && !(counts instanceof JsonArray)) {
-            editsPerLanguage = GsonUtil.getDefaultGson().fromJson(counts, Counts.class).appDescriptionEdits;
-        }
-        return editsPerLanguage == null ? Collections.emptyMap() : editsPerLanguage;
-    }
-
     public int getDescriptionEditTargetsPassedCount() {
         List<Integer> targetList = getDescriptionEdits(false);
         List<Integer> passedList = getDescriptionEdits(true);
@@ -53,10 +44,14 @@ public class EditorTaskCounts {
     }
 
     @NonNull
-    public Map<String, Integer> getCaptionEditsPerLanguage() {
+    public Map<String, Integer> getEditsPerLanguage(String mode) {
         Map<String, Integer> editsPerLanguage = null;
         if (counts != null && !(counts instanceof JsonArray)) {
-            editsPerLanguage = GsonUtil.getDefaultGson().fromJson(counts, Counts.class).appCaptionEdits;
+            if (mode == "caption"){
+                editsPerLanguage = GsonUtil.getDefaultGson().fromJson(counts, Counts.class).appCaptionEdits;
+            } else if (mode == "description"){
+                editsPerLanguage = GsonUtil.getDefaultGson().fromJson(counts, Counts.class).appDescriptionEdits;
+            }
         }
         return editsPerLanguage == null ? Collections.emptyMap() : editsPerLanguage;
     }
