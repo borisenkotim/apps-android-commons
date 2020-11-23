@@ -69,18 +69,9 @@ public class EditorTaskCounts {
         return editsPerLanguage == null ? Collections.emptyMap() : editsPerLanguage;
     }
 
-    @NonNull
-    public List<Integer> getCaptionEditTargetsPassed() {
-        List<Integer> passedList = null;
-        if (targetsPassed != null && !(targetsPassed instanceof JsonArray)) {
-            passedList = GsonUtil.getDefaultGson().fromJson(targetsPassed, Targets.class).appCaptionEdits;
-        }
-        return passedList == null ? Collections.emptyList() : passedList;
-    }
-
     public int getCaptionEditTargetsPassedCount() {
-        List<Integer> targetList = getCaptionEditTargets();
-        List<Integer> passedList = getCaptionEditTargetsPassed();
+        List<Integer> targetList = getCaption(false);
+        List<Integer> passedList = getCaption(true);
         int count = 0;
         if (!targetList.isEmpty() && !passedList.isEmpty()) {
             for (int target : targetList) {
@@ -93,12 +84,13 @@ public class EditorTaskCounts {
     }
 
     @NonNull
-    public List<Integer> getCaptionEditTargets() {
-        List<Integer> targetList = null;
-        if (targets != null && !(targets instanceof JsonArray)) {
-            targetList = GsonUtil.getDefaultGson().fromJson(targets, Targets.class).appCaptionEdits;
+    public List<Integer> getCaption(Boolean passed) {
+        List<Integer> list = null;
+        JsonElement selectedTarget = passed ? this.targetsPassed : this.targets;
+        if (selectedTarget != null && !(selectedTarget instanceof JsonArray)) {
+            list = GsonUtil.getDefaultGson().fromJson(selectedTarget, Targets.class).appCaptionEdits;
         }
-        return targetList == null ? Collections.emptyList() : targetList;
+        return list == null ? Collections.emptyList() : list;
     }
 
     public class Counts {
