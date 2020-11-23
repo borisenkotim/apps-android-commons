@@ -91,14 +91,9 @@ public class LocationServiceManager implements LocationListener {
 
         // Check whether the new location fix is newer or older
         long timeDelta = location.getTime() - currentBestLocation.getTime();
-        boolean isSignificantlyNewer = timeDelta > MIN_LOCATION_UPDATE_REQUEST_TIME_IN_MILLIS;
-        boolean isNewer = timeDelta > 0;
 
         // Check whether the new location fix is more or less accurate
         int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
-        boolean isLessAccurate = accuracyDelta > 0;
-        boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
 
         // Check if the old and new location are from the same provider
         boolean isFromSameProvider = isSameProvider(location.getProvider(),
@@ -112,12 +107,25 @@ public class LocationServiceManager implements LocationListener {
                         location.getLongitude(),
                         results);
 
-        // If it's been more than two minutes since the current location, use the new location
-        // because the user has likely moved
+        return this.updateLocation(timeDelta, accuracyDelta, isFromSameProvider, results);
+    }
+
+    /**
+    * If it's been more than two minutes since the current location, use the new location
+    * because the user has likely moved
+     **/
+    private LocationChangeType updateLocation(long timeDelta, int accuracyDelta, boolean isFromSameProvider, float[] results) {
+
+        boolean isSignificantlyNewer = timeDelta > MIN_LOCATION_UPDATE_REQUEST_TIME_IN_MILLIS;
+        boolean isNewer = timeDelta > 0;
+        boolean isLessAccurate = accuracyDelta > 0;
+        boolean isMoreAccurate = accuracyDelta < 0;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
         if (isSignificantlyNewer
-                || isMoreAccurate
-                || (isNewer && !isLessAccurate)
-                || (isNewer && !isSignificantlyLessAccurate && isFromSameProvider)) {
+            || isMoreAccurate
+            || (isNewer && !isLessAccurate)
+            || (isNewer && !isSignificantlyLessAccurate && isFromSameProvider)) {
             if (results[0] < 1000) { // Means change is smaller than 1000 meter
                 return LocationChangeType.LOCATION_SLIGHTLY_CHANGED;
             } else {
