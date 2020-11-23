@@ -19,30 +19,6 @@ public class EditorTaskCounts {
     @Nullable @SerializedName("targets_passed") private JsonElement targetsPassed;
     @Nullable private JsonElement targets;
 
-    public int getDescriptionEditTargetsPassedCount() {
-        List<Integer> targetList = getDescriptionEdits(false);
-        List<Integer> passedList = getDescriptionEdits(true);
-        int count = 0;
-        if (!targetList.isEmpty() && !passedList.isEmpty()) {
-            for (int target : targetList) {
-                if (passedList.contains(target)) {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
-    @NonNull
-    public List<Integer> getDescriptionEdits(Boolean passed) {
-        List<Integer> list = null;
-        JsonElement selectedTarget = passed ? this.targetsPassed : this.targets;
-        if (selectedTarget != null && !(selectedTarget instanceof JsonArray)) {
-            list = GsonUtil.getDefaultGson().fromJson(selectedTarget, Targets.class).appDescriptionEdits;
-        }
-        return list == null ? Collections.emptyList() : list;
-    }
-
     @NonNull
     public Map<String, Integer> getEditsPerLanguage(String mode) {
         Map<String, Integer> editsPerLanguage = null;
@@ -56,9 +32,9 @@ public class EditorTaskCounts {
         return editsPerLanguage == null ? Collections.emptyMap() : editsPerLanguage;
     }
 
-    public int getCaptionEditTargetsPassedCount() {
-        List<Integer> targetList = getCaptionEdits(false);
-        List<Integer> passedList = getCaptionEdits(true);
+    public int getEditsTargetsPassedCount(String mode) {
+        List<Integer> targetList = getEdits(false, mode);
+        List<Integer> passedList = getEdits(true, mode);
         int count = 0;
         if (!targetList.isEmpty() && !passedList.isEmpty()) {
             for (int target : targetList) {
@@ -71,11 +47,15 @@ public class EditorTaskCounts {
     }
 
     @NonNull
-    public List<Integer> getCaptionEdits(Boolean passed) {
+    public List<Integer> getEdits(Boolean passed, String mode) {
         List<Integer> list = null;
         JsonElement selectedTarget = passed ? this.targetsPassed : this.targets;
         if (selectedTarget != null && !(selectedTarget instanceof JsonArray)) {
-            list = GsonUtil.getDefaultGson().fromJson(selectedTarget, Targets.class).appCaptionEdits;
+            if (mode == "description") {
+                list = GsonUtil.getDefaultGson().fromJson(selectedTarget, Targets.class).appDescriptionEdits;
+            } else if (mode == "caption") {
+                list = GsonUtil.getDefaultGson().fromJson(selectedTarget, Targets.class).appCaptionEdits;
+            }
         }
         return list == null ? Collections.emptyList() : list;
     }
