@@ -48,6 +48,8 @@ class MediaDetailFragmentHelperTest {
     @Throws(Exception::class)
     fun testSanitise() {
         Assert.assertEquals(media.sanitise("testing|part1"), "testing")
+        Assert.assertEquals(media.sanitise("testingpart1"), "testingpart1")
+        Assert.assertEquals(media.sanitise(""), "")
     }
 
     @Test
