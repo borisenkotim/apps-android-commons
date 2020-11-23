@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 import org.wikipedia.util.DateUtil;
 import timber.log.Timber;
 
-public class MediaDetailFragmentHelper extends CommonsDaggerSupportFragment {
+public class MediaDetailFragmentHelper extends CommonsDaggerSupportFragment implements MediaDetailFragmentHelperInterface {
 
   //As per issue #1826(see https://github.com/commons-app/apps-android-commons/issues/1826), some categories come suffixed with strings prefixed with |. As per the discussion
   //that was meant for alphabetical sorting of the categories and can be safely removed.
@@ -93,6 +93,7 @@ public class MediaDetailFragmentHelper extends CommonsDaggerSupportFragment {
    * @param media object of class media
    * @return caption as string
    */
+  @Override
   public String prettyCaption(Media media) {
     for (String caption : media.getCaptions().values()) {
       if (caption.equals("")) {
@@ -104,12 +105,14 @@ public class MediaDetailFragmentHelper extends CommonsDaggerSupportFragment {
     return getString(R.string.detail_caption_empty);
   }
 
+  @Override
   public String prettyDescription(Media media) {
     final String description = chooseDescription(media);
     return description.isEmpty() ? getString(R.string.detail_description_empty)
         : description;
   }
 
+  @Override
   public String chooseDescription(Media media) {
     final Map<String, String> descriptions = media.getDescriptions();
     final String multilingualDesc = descriptions.get(Locale.getDefault().getLanguage());
@@ -126,6 +129,7 @@ public class MediaDetailFragmentHelper extends CommonsDaggerSupportFragment {
     return discussion.isEmpty() ? getString(R.string.detail_discussion_empty) : discussion;
   }
 
+  @Override
   public String prettyLicense(Media media) {
     String licenseKey = media.getLicense();
     Timber.d("Media license is: %s", licenseKey);
@@ -135,6 +139,7 @@ public class MediaDetailFragmentHelper extends CommonsDaggerSupportFragment {
     return licenseKey;
   }
 
+  @Override
   public String prettyUploadedDate(Media media) {
     Date date = media.getDateUploaded();
     if (date == null || date.toString() == null || date.toString().isEmpty()) {
@@ -148,6 +153,7 @@ public class MediaDetailFragmentHelper extends CommonsDaggerSupportFragment {
    *
    * @return Coordinates as text.
    */
+  @Override
   public String prettyCoordinates(Media media) {
     if (media.getCoordinates() == null) {
       return getString(R.string.media_detail_coordinates_empty);
